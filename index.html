@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<!-- saved from url=(0049)file:///C:/Users/Ben/Downloads/misbah-lms-v2.html -->
+<!-- saved from url=(0051)file:///C:/Users/Ben/Downloads/misbah-lms-v2_1.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Misbah &amp; Friends — Learning Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com/">
   <link href="./index_files/css2" rel="stylesheet">
@@ -471,6 +470,233 @@ const fd = (d, o) => d ? new Date(d).toLocaleDateString("en-GB", o || {
   year: "numeric"
 }) : "—";
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const MONTHS_SQ = ["Janar", "Shkurt", "Mars", "Prill", "Maj", "Qershor", "Korrik", "Gusht", "Shtator", "Tetor", "Nëntor", "Dhjetor"];
+
+// ─── TRANSLATIONS ─────────────────────────────────────────────────────────────
+const TR = {
+  en: {
+    dashboard: "Dashboard",
+    students: "Students",
+    faculty: "Faculty",
+    classes: "Classes",
+    payments: "Payments",
+    schedule: "Schedule",
+    workhours: "Working Hours",
+    reports: "Reports",
+    events: "Events",
+    export: "Export Data",
+    users: "Manage Users",
+    settings: "Settings",
+    myclasses: "My Classes",
+    attendance: "Attendance",
+    materials: "Materials",
+    timelog: "Time Log",
+    mychild: "My Child",
+    progress: "Progress",
+    messages: "Messages",
+    myschedule: "My Schedule",
+    mypayments: "My Payments",
+    chat: "Chat",
+    signin: "Sign In",
+    signout: "Sign Out",
+    welcome: "Welcome",
+    addStudent: "Add Student",
+    addProfessor: "Add Professor",
+    addClass: "Add Class",
+    save: "Save",
+    cancel: "Cancel",
+    delete: "Delete",
+    edit: "Edit",
+    search: "Search",
+    name: "Name",
+    email: "Email",
+    password: "Password",
+    phone: "Phone",
+    instrument: "Instrument",
+    level: "Level",
+    day: "Day",
+    time: "Time",
+    room: "Room",
+    duration: "Duration",
+    parent: "Parent",
+    grade: "Grade",
+    notes: "Notes",
+    month: "Month",
+    year: "Year",
+    amount: "Amount",
+    method: "Method",
+    attendance_pct: "Attendance %",
+    progress_pct: "Progress %",
+    teacher: "Teacher",
+    student_portal: "Student Portal",
+    parent_portal: "Parent Portal",
+    administration: "Administration",
+    professor: "Professor",
+    darkmode: "Dark Mode",
+    lightmode: "Light Mode",
+    collapse: "Collapse",
+    nodata: "No data yet",
+    loading: "Loading...",
+    saving: "Saving...",
+    enrolled: "enrolled",
+    active: "active",
+    thisMonth: "This Month",
+    unpaid: "unpaid",
+    recentStudents: "Recent Students",
+    upcomingEvents: "Upcoming Events",
+    todaySchedule: "Today's Classes",
+    nextClass: "Next Class",
+    myStudents: "My Students",
+    recordAttendance: "Record Attendance",
+    present: "Present",
+    absent: "Absent",
+    addEntry: "Add Entry",
+    totalHours: "Total Hours",
+    sessions: "Sessions",
+    clockIn: "Clock In",
+    clockOut: "Clock Out",
+    export_all: "Export All",
+    fullExport: "Full School Export",
+    download: "Download",
+    language: "Language",
+    academicYear: "Academic Year",
+    notifications: "Notifications",
+    privacy: "Privacy & GDPR",
+    linked_parent: "Link to Parent Account",
+    teacher_notes: "Teacher Notes",
+    parent_name: "Parent Name",
+    class_name: "Class Name",
+    create_class: "Create New Class",
+    no_events: "No upcoming events",
+    no_students: "No students found",
+    chat_placeholder: "Type a message...",
+    send: "Send",
+    payment_status: "Payment Status",
+    confirmed: "Confirmed",
+    my_feedback: "My Feedback",
+    overall_progress: "Overall Progress",
+    monthly_trend: "Monthly Trend",
+    performance: "Performance Breakdown",
+    upcoming: "Upcoming",
+    announcements: "Announcements",
+    no_announcements: "No announcements",
+    signin_label: "Sign in with your school credentials",
+    about: "About",
+    version: "Version",
+    platform: "Platform"
+  },
+  sq: {
+    dashboard: "Paneli",
+    students: "Nxënësit",
+    faculty: "Mësuesit",
+    classes: "Klasat",
+    payments: "Pagesat",
+    schedule: "Orari",
+    workhours: "Orët e Punës",
+    reports: "Raportet",
+    events: "Ngjarjet",
+    export: "Eksporto të Dhënat",
+    users: "Menaxho Përdoruesit",
+    settings: "Cilësimet",
+    myclasses: "Klasat e Mia",
+    attendance: "Prezenca",
+    materials: "Materialet",
+    timelog: "Regjistrimi i Orëve",
+    mychild: "Fëmija Im",
+    progress: "Progresi",
+    messages: "Mesazhet",
+    myschedule: "Orari Im",
+    mypayments: "Pagesat e Mia",
+    chat: "Bisedë",
+    signin: "Hyr",
+    signout: "Dil",
+    welcome: "Mirësevini",
+    addStudent: "Shto Nxënës",
+    addProfessor: "Shto Mësues",
+    addClass: "Shto Klasë",
+    save: "Ruaj",
+    cancel: "Anulo",
+    delete: "Fshi",
+    edit: "Ndrysho",
+    search: "Kërko",
+    name: "Emri",
+    email: "Email",
+    password: "Fjalëkalimi",
+    phone: "Telefoni",
+    instrument: "Instrumenti",
+    level: "Niveli",
+    day: "Dita",
+    time: "Ora",
+    room: "Dhoma",
+    duration: "Kohëzgjatja",
+    parent: "Prindi",
+    grade: "Nota",
+    notes: "Shënime",
+    month: "Muaji",
+    year: "Viti",
+    amount: "Shuma",
+    method: "Metoda",
+    attendance_pct: "Prezenca %",
+    progress_pct: "Progresi %",
+    teacher: "Mësuesi",
+    student_portal: "Portali i Nxënësit",
+    parent_portal: "Portali i Prindit",
+    administration: "Administrata",
+    professor: "Profesor",
+    darkmode: "Modaliteti i Errët",
+    lightmode: "Modaliteti i Bardhë",
+    collapse: "Mbyll",
+    nodata: "Nuk ka të dhëna",
+    loading: "Duke ngarkuar...",
+    saving: "Duke ruajtur...",
+    enrolled: "të regjistruar",
+    active: "aktive",
+    thisMonth: "Këtë Muaj",
+    unpaid: "të papaguar",
+    recentStudents: "Nxënësit e Fundit",
+    upcomingEvents: "Ngjarjet e Ardhshme",
+    todaySchedule: "Klasat e Sotme",
+    nextClass: "Klasa Tjetër",
+    myStudents: "Nxënësit e Mi",
+    recordAttendance: "Regjistro Prezencën",
+    present: "Prezent",
+    absent: "Mungon",
+    addEntry: "Shto Hyrje",
+    totalHours: "Orët Totale",
+    sessions: "Sesione",
+    clockIn: "Hyrja",
+    clockOut: "Dalja",
+    export_all: "Eksporto Gjithçka",
+    fullExport: "Eksport i Plotë",
+    download: "Shkarko",
+    language: "Gjuha",
+    academicYear: "Viti Akademik",
+    notifications: "Njoftimet",
+    privacy: "Privatësia & GDPR",
+    linked_parent: "Lidh me Llogarinë e Prindit",
+    teacher_notes: "Shënime të Mësuesit",
+    parent_name: "Emri i Prindit",
+    class_name: "Emri i Klasës",
+    create_class: "Krijo Klasë të Re",
+    no_events: "Nuk ka ngjarje",
+    no_students: "Nuk u gjetën nxënës",
+    chat_placeholder: "Shkruaj një mesazh...",
+    send: "Dërgo",
+    payment_status: "Statusi i Pagesës",
+    confirmed: "Konfirmuar",
+    my_feedback: "Vlerësimi Im",
+    overall_progress: "Progresi i Përgjithshëm",
+    monthly_trend: "Tendenca Mujore",
+    performance: "Vlerësimi i Performancës",
+    upcoming: "Të Ardhshme",
+    announcements: "Njoftime",
+    no_announcements: "Nuk ka njoftime",
+    signin_label: "Identifikohuni me kredencialet e shkollës",
+    about: "Rreth",
+    version: "Versioni",
+    platform: "Platforma"
+  }
+};
 
 // ─── EXCEL EXPORT ─────────────────────────────────────────────────────────────
 const toCSV = (headers, rows) => {
@@ -1003,7 +1229,7 @@ const Stat = ({
       textTransform: "uppercase",
       marginBottom: 1,
       fontFamily: "'Cormorant Garamond',serif",
-      fontStyle: "italic"
+      fontStyle: "normal"
     }
   }, label), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1634,13 +1860,29 @@ const MobHeader = ({
       letterSpacing: "0.08em"
     }
   }, "Misbah & Friends \xB7 ", sub)), /*#__PURE__*/React.createElement("button", {
+    onClick: toggleLang,
+    style: {
+      width: 32,
+      height: 32,
+      borderRadius: 8,
+      background: T.input,
+      border: "1px solid " + T.border,
+      cursor: "pointer",
+      color: T.text2,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexShrink: 0,
+      fontSize: 16
+    }
+  }, lang === "en" ? "🇦🇱" : "🇬🇧"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setDarkMode(!darkMode),
     style: {
       width: 32,
       height: 32,
       borderRadius: 8,
       background: T.input,
-      border: `1px solid ${T.border}`,
+      border: "1px solid " + T.border,
       cursor: "pointer",
       color: T.text2,
       display: "flex",
@@ -2236,6 +2478,32 @@ const Sidebar = ({
       fontSize: 12
     }
   }, darkMode ? "Light Mode" : "Dark Mode")), /*#__PURE__*/React.createElement("button", {
+    onClick: toggleLang,
+    style: {
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: collapsed ? "center" : "flex-start",
+      gap: 10,
+      padding: collapsed ? "9px" : "9px 11px",
+      borderRadius: 9,
+      cursor: "pointer",
+      border: "none",
+      background: "transparent",
+      color: T.text2,
+      marginBottom: 1
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 14,
+      fontWeight: 700,
+      color: T.gold
+    }
+  }, lang === "en" ? "🇦🇱" : "🇬🇧"), !collapsed && /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12
+    }
+  }, lang === "en" ? "Shqip" : "English")), /*#__PURE__*/React.createElement("button", {
     onClick: () => setCollapsed(!collapsed),
     style: {
       width: "100%",
@@ -2783,7 +3051,29 @@ const StudentsPage = ({
   const load = async () => {
     setLoading(true);
     try {
-      const [s, p] = await Promise.all([sb.select("students", "?order=name"), sb.select("profiles", "?role=eq.parent&order=full_name")]);
+      // Professors see only students in their classes
+      let studentQuery = "?order=name";
+      if (role === "professor" && session?.profile?.email) {
+        // Get professor's classes first
+        const profClasses = await sb.select("professors", "?email=eq." + session.profile.email);
+        if (profClasses.length && profClasses[0].id) {
+          const ts = await sb.select("timesheets", "?professor_id=eq." + profClasses[0].id + "&select=professor_id").catch(() => []);
+        }
+        // Filter by classes that belong to this professor
+        const allClasses = await sb.select("classes", "?professor=eq." + encodeURIComponent(session.profile.full_name || "") + "&select=name");
+        if (allClasses.length) {
+          const classNames = allClasses.map(c => c.name);
+          // Load students whose class_name is in professor's classes
+          const allStudents = await sb.select("students", "?order=name");
+          const myStudents = allStudents.filter(s => classNames.includes(s.class_name));
+          const [p] = await Promise.all([sb.select("profiles", "?role=eq.parent&order=full_name")]);
+          setStudents(myStudents);
+          setParents(p);
+          setLoading(false);
+          return;
+        }
+      }
+      const [s, p] = await Promise.all([sb.select("students", studentQuery), sb.select("profiles", "?role=eq.parent&order=full_name")]);
       setStudents(s);
       setParents(p);
     } catch (e) {
@@ -5041,32 +5331,41 @@ const UsersPage = ({
 const Dashboard = ({
   session,
   toast,
-  th
+  th,
+  t,
+  lang
 }) => {
   const T = th || DARK;
-  const [stats, setStats] = useState({
-    students: 0,
-    professors: 0,
-    classes: 0,
-    payments: 0
-  });
-  const [recentStudents, setRecentStudents] = useState([]);
-  const [recentEvents, setRecentEvents] = useState([]);
-  const [unpaidCount, setUnpaidCount] = useState(0);
-  const [loading, setLoading] = useState(true);
   const role = session.profile.role;
   const name = session.profile.full_name;
+  const [students, setStudents] = useState([]);
+  const [profs, setProfs] = useState([]);
+  const [classes, setClasses] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const today = dayNames[new Date().getDay()];
+  const month = MONTHS[new Date().getMonth()];
+  const yr = new Date().getFullYear();
   useEffect(() => {
-    Promise.all([sb.select("students", "?order=name&limit=5"), sb.select("professors", "?select=id"), sb.select("classes", "?select=id"), sb.select("events", "?order=date&limit=4"), sb.select("payments", `?month=eq.${MONTHS[new Date().getMonth()]}&year=eq.${new Date().getFullYear()}`)]).then(([students, profs, classes, events, payments]) => {
-      setStats({
-        students: students.length,
-        professors: profs.length,
-        classes: classes.length,
-        payments: payments.length
-      });
-      setRecentStudents(students);
-      setRecentEvents(events);
-      setUnpaidCount(Math.max(0, students.length - payments.length));
+    Promise.all([sb.select("students", "?order=name"), sb.select("professors", "?select=id,name,email"), sb.select("classes", "?order=day,time"), sb.select("events", "?order=date&limit=4"), sb.select("payments", "?month=eq." + month + "&year=eq." + yr)]).then(([st, pr, cl, ev, pay]) => {
+      let mySt = st;
+      let myCl = cl;
+      if (role === "professor") {
+        myCl = cl.filter(c => c.professor && c.professor.includes(name?.split(" ").slice(-1)[0] || name || "___"));
+        const myNames = new Set(myCl.map(c => c.name));
+        mySt = st.filter(s => myNames.has(s.class_name));
+        if (!myCl.length) {
+          myCl = cl;
+          mySt = st;
+        }
+      }
+      setStudents(mySt);
+      setProfs(pr);
+      setClasses(myCl);
+      setEvents(ev);
+      setPayments(pay);
       setLoading(false);
     }).catch(e => {
       toast(e.message, "error");
@@ -5076,79 +5375,268 @@ const Dashboard = ({
   if (loading) return /*#__PURE__*/React.createElement(Spinner, {
     th: th
   });
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginBottom: 20
-    }
-  }, /*#__PURE__*/React.createElement("h1", {
-    style: {
-      fontSize: 26,
-      fontFamily: "'Cormorant Garamond',serif",
-      color: T.text,
-      margin: "0 0 4px",
-      fontWeight: 800
-    }
-  }, "Welcome, ", name?.split(" ")[0], " \uD83D\uDC4B"), /*#__PURE__*/React.createElement("p", {
-    style: {
-      color: T.text3,
-      fontSize: 13,
-      margin: 0
-    }
-  }, new Date().toLocaleDateString("en-GB", {
+  const todayClasses = classes.filter(c => c.day === today);
+  const unpaid = Math.max(0, students.length - payments.length);
+  const sqDays = ["E Diel", "E Hënë", "E Martë", "E Mërkurë", "E Enjte", "E Premte", "E Shtunë"];
+  const sqShort = ["Die", "Hën", "Mar", "Mër", "Enj", "Pre", "Sht"];
+  const dateStr = new Date().toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB", {
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric"
-  }))), /*#__PURE__*/React.createElement("div", {
+  });
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 22
+    }
+  }, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 28,
+      fontFamily: "'DM Sans',sans-serif",
+      color: T.text,
+      margin: "0 0 3px",
+      fontWeight: 700
+    }
+  }, lang === "sq" ? "Mirësevini" : "Welcome", ", ", name?.split(" ")[0], " \uD83D\uDC4B"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: T.text3,
+      fontSize: 13,
+      margin: 0,
+      textTransform: "capitalize"
+    }
+  }, dateStr)), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "1fr 1fr",
       gap: 10,
-      marginBottom: 16
+      marginBottom: 18
     }
   }, /*#__PURE__*/React.createElement(Stat, {
     icon: "users",
-    label: "Students",
-    value: stats.students,
+    label: lang === "sq" ? "Nxënës" : "Students",
+    value: students.length,
     color: "#C9A84C",
     th: th
-  }), /*#__PURE__*/React.createElement(Stat, {
+  }), role === "admin" ? /*#__PURE__*/React.createElement(Stat, {
     icon: "book",
-    label: "Faculty",
-    value: stats.professors,
+    label: lang === "sq" ? "Mësues" : "Faculty",
+    value: profs.length,
     color: "#60a5fa",
+    th: th
+  }) : /*#__PURE__*/React.createElement(Stat, {
+    icon: "check",
+    label: lang === "sq" ? "Mesatare" : "Avg Att.",
+    value: students.length ? Math.round(students.reduce((s, x) => s + (x.attendance || 0), 0) / students.length) + "%" : "—",
+    color: "#4ade80",
     th: th
   }), /*#__PURE__*/React.createElement(Stat, {
     icon: "music",
-    label: "Classes",
-    value: stats.classes,
+    label: lang === "sq" ? "Klasat" : "Classes",
+    value: classes.length,
     color: "#4ade80",
     th: th
   }), /*#__PURE__*/React.createElement(Stat, {
     icon: "credit",
-    label: "Paid This Month",
-    value: stats.payments,
-    sub: unpaidCount > 0 ? `${unpaidCount} unpaid` : "",
-    color: unpaidCount > 0 ? "#f87171" : "#4ade80",
+    label: lang === "sq" ? "Pagesa" : "Payments",
+    value: payments.length,
+    sub: unpaid > 0 ? unpaid + " " + (lang === "sq" ? "papag." : "unpaid") : "",
+    color: unpaid > 0 ? "#f87171" : "#4ade80",
     th: th
   })), /*#__PURE__*/React.createElement(Crd, {
     th: th,
     style: {
       padding: 16,
-      marginBottom: 12
+      marginBottom: 14
     }
   }, /*#__PURE__*/React.createElement(SH, {
-    title: "Recent Students",
+    title: lang === "sq" ? "Klasat e Sotme" : "Today's Classes",
+    color: "#60a5fa",
+    action: /*#__PURE__*/React.createElement(Bdg, {
+      text: lang === "sq" ? sqDays[new Date().getDay()] : today,
+      color: "#60a5fa"
+    }),
+    th: th
+  }), todayClasses.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      padding: "10px 0",
+      color: T.text3,
+      fontSize: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 38,
+      height: 38,
+      borderRadius: 10,
+      background: "rgba(96,165,250,0.08)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "#60a5fa",
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: "calendar",
+    s: 17
+  })), /*#__PURE__*/React.createElement("span", null, lang === "sq" ? "Nuk ka klasa sot." : "No classes scheduled today.")) : todayClasses.map(c => {
+    const col = lc(c.level);
+    return /*#__PURE__*/React.createElement("div", {
+      key: c.id,
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: "12px 0",
+        borderBottom: "1px solid " + T.rowBorder
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 54,
+        height: 54,
+        borderRadius: 12,
+        background: col + "12",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        border: "1px solid " + col + "28",
+        flexShrink: 0
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 12,
+        fontWeight: 700,
+        color: col,
+        lineHeight: 1.2
+      }
+    }, c.time), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 10,
+        color: T.text3,
+        marginTop: 1
+      }
+    }, c.duration, "m")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        flex: 1,
+        minWidth: 0
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 15,
+        fontWeight: 600,
+        color: T.text,
+        marginBottom: 2
+      }
+    }, c.name), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 12,
+        color: T.text3,
+        display: "flex",
+        gap: 8,
+        flexWrap: "wrap"
+      }
+    }, c.professor && role === "admin" && /*#__PURE__*/React.createElement("span", null, "👨‍🏫 " + c.professor.replace("Prof. ", "")), c.room && /*#__PURE__*/React.createElement("span", null, "📍 " + c.room), c.students > 0 && /*#__PURE__*/React.createElement("span", null, c.students + " " + (lang === "sq" ? "nxënës" : "students")))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        textAlign: "center",
+        flexShrink: 0
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 26
+      }
+    }, emojiFor(c.instrument)), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Bdg, {
+      text: c.level || "—",
+      color: col
+    }))));
+  })), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: 16,
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement(SH, {
+    title: lang === "sq" ? "Orari Javor" : "Weekly Overview",
     color: T.gold,
     th: th
-  }), recentStudents.length === 0 && /*#__PURE__*/React.createElement("div", {
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6,
+      overflowX: "auto",
+      paddingBottom: 2,
+      scrollbarWidth: "none"
+    }
+  }, [0, 1, 2, 3, 4, 5].map(i => {
+    const full = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][i];
+    const dc = classes.filter(c => c.day === full);
+    const isToday = full === today;
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      style: {
+        minWidth: 76,
+        flexShrink: 0,
+        padding: "10px 6px",
+        borderRadius: 12,
+        background: isToday ? T.gold + "18" : T === LIGHT ? "rgba(0,0,0,0.03)" : "rgba(255,255,255,0.04)",
+        border: "1.5px solid " + (isToday ? T.gold + "55" : T.border),
+        textAlign: "center"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        fontWeight: 700,
+        color: isToday ? T.gold : T.text3,
+        textTransform: "uppercase",
+        letterSpacing: "0.04em",
+        marginBottom: 6
+      }
+    }, lang === "sq" ? sqShort[i + 1] : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][i]), dc.length === 0 ? /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: T.text3,
+        padding: "4px 0"
+      }
+    }, "\u2014") : dc.map(c => /*#__PURE__*/React.createElement("div", {
+      key: c.id,
+      style: {
+        fontSize: 10,
+        padding: "3px 5px",
+        borderRadius: 5,
+        background: lc(c.level) + "1a",
+        color: lc(c.level),
+        marginBottom: 3,
+        fontWeight: 600,
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis"
+      }
+    }, c.time)), dc.length > 0 && /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 10,
+        color: T.text3,
+        marginTop: 3
+      }
+    }, dc.length + " cl."));
+  }))), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: 16,
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement(SH, {
+    title: lang === "sq" ? "Nxënësit e Fundit" : "Recent Students",
+    color: T.gold,
+    th: th
+  }), students.length === 0 && /*#__PURE__*/React.createElement("div", {
     style: {
       color: T.text3,
       fontSize: 13,
       textAlign: "center",
-      padding: "16px 0"
+      padding: "14px 0"
     }
-  }, "No students yet."), recentStudents.map(s => /*#__PURE__*/React.createElement(Row, {
+  }, lang === "sq" ? "Nuk ka nxënës ende." : "No students yet."), students.slice(0, 5).map(s => /*#__PURE__*/React.createElement(Row, {
     key: s.id,
     th: th,
     left: /*#__PURE__*/React.createElement(Av, {
@@ -5157,7 +5645,7 @@ const Dashboard = ({
       size: 38
     }),
     title: s.name,
-    sub: `${s.class_name || "—"} · ${s.attendance || 0}% att.`,
+    sub: (s.class_name || "—") + " · " + (s.attendance || 0) + "% att.",
     right: /*#__PURE__*/React.createElement(Bdg, {
       text: s.grade || "—",
       color: "#C9A84C"
@@ -5168,37 +5656,36 @@ const Dashboard = ({
       padding: 16
     }
   }, /*#__PURE__*/React.createElement(SH, {
-    title: "Upcoming Events",
+    title: lang === "sq" ? "Ngjarjet e Ardhshme" : "Upcoming Events",
     color: "#a78bfa",
     th: th
-  }), recentEvents.length === 0 && /*#__PURE__*/React.createElement("div", {
+  }), events.length === 0 && /*#__PURE__*/React.createElement("div", {
     style: {
       color: T.text3,
       fontSize: 13,
       textAlign: "center",
-      padding: "16px 0"
+      padding: "14px 0"
     }
-  }, "No events yet."), recentEvents.map(ev => {
+  }, lang === "sq" ? "Nuk ka ngjarje ende." : "No events yet."), events.map(ev => {
     const col = ev.type === "concert" ? "#f59e0b" : ev.type === "meeting" ? "#60a5fa" : "#a78bfa";
     return /*#__PURE__*/React.createElement(Row, {
       key: ev.id,
       th: th,
       left: /*#__PURE__*/React.createElement("div", {
         style: {
-          width: 40,
+          width: 38,
           textAlign: "center"
         }
       }, /*#__PURE__*/React.createElement("div", {
         style: {
-          fontSize: 18,
-          fontWeight: 800,
+          fontSize: 17,
+          fontWeight: 700,
           color: col,
-          fontFamily: "'Cormorant Garamond',serif",
           lineHeight: 1
         }
       }, ev.date ? new Date(ev.date).getDate() : "?"), /*#__PURE__*/React.createElement("div", {
         style: {
-          fontSize: 10,
+          fontSize: 9,
           color: T.text3,
           textTransform: "uppercase"
         }
@@ -5635,7 +6122,7 @@ const ParentChildPage = ({
       fontSize: 14,
       margin: 0,
       lineHeight: 1.7,
-      fontStyle: "italic"
+      fontStyle: "normal"
     }
   }, "\"", student.teacher_notes || "No notes yet.", "\""))));
 };
@@ -7433,7 +7920,7 @@ const StudentDashboard = ({
       fontSize: 14,
       margin: 0,
       lineHeight: 1.7,
-      fontStyle: "italic"
+      fontStyle: "normal"
     }
   }, '"' + student.teacher_notes + '"'))), /*#__PURE__*/React.createElement(Crd, {
     th: th,
@@ -7519,6 +8006,15 @@ function App() {
   const [showMore, setShowMore] = useState(false);
   const [toast, setToastState] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
+  const [lang, setLang] = useState(localStorage.getItem("mf_lang") || "en");
+  const t = TR[lang] || TR.en;
+  const toggleLang = () => {
+    const nl = lang === "en" ? "sq" : "en";
+    setLang(nl);
+    try {
+      localStorage.setItem("mf_lang", nl);
+    } catch (e) {}
+  };
   const {
     isMobile,
     isTablet
@@ -7553,14 +8049,20 @@ function App() {
   };
   if (!session) return /*#__PURE__*/React.createElement(Login, {
     onLogin: handleLogin,
-    th: th
+    th: th,
+    lang: lang,
+    t: t,
+    toggleLang: toggleLang
   });
   const role = session.profile.role;
   const cp = {
     role,
     toast: showToast,
     session,
-    th
+    th,
+    lang,
+    t,
+    toggleLang
   };
   const renderPage = () => {
     if (page === "dashboard") return role === "student" ? /*#__PURE__*/React.createElement(StudentDashboard, cp) : /*#__PURE__*/React.createElement(Dashboard, cp);
