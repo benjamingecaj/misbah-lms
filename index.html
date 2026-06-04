@@ -4,15 +4,10 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <title>Misbah And Friends — Learning Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Crimson+Pro:ital,wght@1,300;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;background:#0a0a0a;overflow:hidden;font-family:Inter,sans-serif}
-    #root{height:100%}
-  </style>
+  <style>*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;overflow:hidden}#root{height:100%}</style>
 </head>
 <body>
 <div id="root"></div>
@@ -324,7 +319,45 @@ function _extends() { return _extends = Object.assign ? Object.assign.bind() : f
 const SUPABASE_URL = "https://xyrphosiclowqvjlwgbx.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5cnBob3NpY2xvd3F2amx3Z2J4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTc5MjcsImV4cCI6MjA5NjA5MzkyN30.3xrMsxdbbi9V99g-c329VdBm2lL-zYsXxhHCXZsiFqg";
 
-// ─── SUPABASE CLIENT ──────────────────────────────────────────────────────────
+// ─── THEME ────────────────────────────────────────────────────────────────────
+const DARK = {
+  bg: "#080808",
+  bg2: "#0f0f0f",
+  bg3: "#181818",
+  surface: "rgba(255,255,255,0.028)",
+  border: "rgba(255,255,255,0.07)",
+  text: "#ffffff",
+  text2: "rgba(255,255,255,0.55)",
+  text3: "rgba(255,255,255,0.35)",
+  input: "rgba(255,255,255,0.06)",
+  inputBorder: "rgba(255,255,255,0.1)",
+  navBg: "rgba(8,8,8,0.97)",
+  sidebarBg: "#090909",
+  sidebarBorder: "rgba(255,255,255,0.055)",
+  rowBorder: "rgba(255,255,255,0.042)",
+  gold: "#C9A84C",
+  shadow: "0 4px 24px rgba(0,0,0,0.5)"
+};
+const LIGHT = {
+  bg: "#f5f5f7",
+  bg2: "#ffffff",
+  bg3: "#ebebed",
+  surface: "#ffffff",
+  border: "rgba(0,0,0,0.09)",
+  text: "#0a0a0a",
+  text2: "rgba(0,0,0,0.55)",
+  text3: "rgba(0,0,0,0.38)",
+  input: "#ffffff",
+  inputBorder: "rgba(0,0,0,0.15)",
+  navBg: "rgba(255,255,255,0.97)",
+  sidebarBg: "#ffffff",
+  sidebarBorder: "rgba(0,0,0,0.08)",
+  rowBorder: "rgba(0,0,0,0.06)",
+  gold: "#B8860B",
+  shadow: "0 4px 24px rgba(0,0,0,0.1)"
+};
+
+// ─── SUPABASE ─────────────────────────────────────────────────────────────────
 const sb = {
   headers: {
     "apikey": SUPABASE_ANON_KEY,
@@ -332,35 +365,35 @@ const sb = {
     "Content-Type": "application/json",
     "Prefer": "return=representation"
   },
-  url: (table, query = "") => `${SUPABASE_URL}/rest/v1/${table}${query}`,
-  authUrl: path => `${SUPABASE_URL}/auth/v1/${path}`,
-  async select(table, query = "") {
-    const r = await fetch(this.url(table, query), {
+  url: (t, q = "") => `${SUPABASE_URL}/rest/v1/${t}${q}`,
+  authUrl: p => `${SUPABASE_URL}/auth/v1/${p}`,
+  async select(t, q = "") {
+    const r = await fetch(this.url(t, q), {
       headers: this.headers
     });
     if (!r.ok) throw new Error(await r.text());
     return r.json();
   },
-  async insert(table, data) {
-    const r = await fetch(this.url(table), {
+  async insert(t, d) {
+    const r = await fetch(this.url(t), {
       method: "POST",
       headers: this.headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(d)
     });
     if (!r.ok) throw new Error(await r.text());
     return r.json();
   },
-  async update(table, id, data) {
-    const r = await fetch(this.url(table, `?id=eq.${id}`), {
+  async update(t, id, d) {
+    const r = await fetch(this.url(t, `?id=eq.${id}`), {
       method: "PATCH",
       headers: this.headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(d)
     });
     if (!r.ok) throw new Error(await r.text());
     return r.json();
   },
-  async remove(table, id) {
-    const r = await fetch(this.url(table, `?id=eq.${id}`), {
+  async remove(t, id) {
+    const r = await fetch(this.url(t, `?id=eq.${id}`), {
       method: "DELETE",
       headers: this.headers
     });
@@ -380,7 +413,7 @@ const sb = {
       })
     });
     const d = await r.json();
-    if (!r.ok) throw new Error(d.error_description || d.msg || "Login failed");
+    if (!r.ok) throw new Error(d.error_description || "Login failed");
     return d;
   },
   async signOut(token) {
@@ -392,12 +425,12 @@ const sb = {
       }
     });
   },
-  setToken(token) {
-    this.headers["Authorization"] = `Bearer ${token}`;
+  setToken(t) {
+    this.headers["Authorization"] = `Bearer ${t}`;
   }
 };
 
-// ─── RESPONSIVE HOOK ──────────────────────────────────────────────────────────
+// ─── HOOKS ────────────────────────────────────────────────────────────────────
 const useMedia = () => {
   const [w, setW] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
   useEffect(() => {
@@ -431,6 +464,33 @@ const fd = (d, o) => d ? new Date(d).toLocaleDateString("en-GB", o || {
   month: "short",
   year: "numeric"
 }) : "—";
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+// ─── EXCEL EXPORT ─────────────────────────────────────────────────────────────
+const toCSV = (headers, rows) => {
+  const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  return [headers.map(esc).join(','), ...rows.map(r => r.map(esc).join(','))].join('\n');
+};
+const downloadCSV = (filename, csv) => {
+  const blob = new Blob([csv], {
+    type: 'text/csv;charset=utf-8;'
+  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+};
+const downloadExcel = async sheets => {
+  // Multi-sheet as separate CSV files zipped, or single workbook via HTML table trick
+  // We'll use a proper XLSX-like format via data URI
+  sheets.forEach(({
+    name,
+    headers,
+    rows
+  }) => {
+    downloadCSV(`${name}.csv`, toCSV(headers, rows));
+  });
+};
 
 // ─── ICONS ────────────────────────────────────────────────────────────────────
 const Ic = ({
@@ -670,13 +730,6 @@ const Ic = ({
     }), /*#__PURE__*/React.createElement("polyline", {
       points: "7 3 7 8 15 8"
     })),
-    eye: /*#__PURE__*/React.createElement("svg", p, /*#__PURE__*/React.createElement("path", {
-      d: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-    }), /*#__PURE__*/React.createElement("circle", {
-      cx: "12",
-      cy: "12",
-      r: "3"
-    })),
     download: /*#__PURE__*/React.createElement("svg", p, /*#__PURE__*/React.createElement("path", {
       d: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"
     }), /*#__PURE__*/React.createElement("polyline", {
@@ -693,6 +746,82 @@ const Ic = ({
       cx: "12",
       cy: "7",
       r: "4"
+    })),
+    sun: /*#__PURE__*/React.createElement("svg", p, /*#__PURE__*/React.createElement("circle", {
+      cx: "12",
+      cy: "12",
+      r: "5"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: "12",
+      y1: "1",
+      x2: "12",
+      y2: "3"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: "12",
+      y1: "21",
+      x2: "12",
+      y2: "23"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: "4.22",
+      y1: "4.22",
+      x2: "5.64",
+      y2: "5.64"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: "18.36",
+      y1: "18.36",
+      x2: "19.78",
+      y2: "19.78"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: "1",
+      y1: "12",
+      x2: "3",
+      y2: "12"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: "21",
+      y1: "12",
+      x2: "23",
+      y2: "12"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: "4.22",
+      y1: "19.78",
+      x2: "5.64",
+      y2: "18.36"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: "18.36",
+      y1: "5.64",
+      x2: "19.78",
+      y2: "4.22"
+    })),
+    moon: /*#__PURE__*/React.createElement("svg", p, /*#__PURE__*/React.createElement("path", {
+      d: "M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"
+    })),
+    credit: /*#__PURE__*/React.createElement("svg", p, /*#__PURE__*/React.createElement("rect", {
+      x: "1",
+      y: "4",
+      width: "22",
+      height: "16",
+      rx: "2",
+      ry: "2"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: "1",
+      y1: "10",
+      x2: "23",
+      y2: "10"
+    })),
+    filetext: /*#__PURE__*/React.createElement("svg", p, /*#__PURE__*/React.createElement("path", {
+      d: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+    }), /*#__PURE__*/React.createElement("polyline", {
+      points: "14 2 14 8 20 8"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: "16",
+      y1: "13",
+      x2: "8",
+      y2: "13"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: "16",
+      y1: "17",
+      x2: "8",
+      y2: "17"
     }))
   };
   return icons[n] || null;
@@ -705,9 +834,9 @@ const Ring = ({
   color = "#C9A84C",
   thick = 6
 }) => {
-  const r = (size - thick * 2) / 2;
-  const circ = 2 * Math.PI * r;
-  const offset = circ - Math.min(value || 0, 100) / 100 * circ;
+  const r = (size - thick * 2) / 2,
+    circ = 2 * Math.PI * r,
+    offset = circ - Math.min(value || 0, 100) / 100 * circ;
   return /*#__PURE__*/React.createElement("svg", {
     width: size,
     height: size,
@@ -721,7 +850,7 @@ const Ring = ({
     cy: size / 2,
     r: r,
     fill: "none",
-    stroke: "rgba(255,255,255,0.08)",
+    stroke: "rgba(128,128,128,0.15)",
     strokeWidth: thick
   }), /*#__PURE__*/React.createElement("circle", {
     cx: size / 2,
@@ -741,11 +870,12 @@ const Ring = ({
 const Bar = ({
   value,
   color,
-  h = 6
+  h = 6,
+  th
 }) => /*#__PURE__*/React.createElement("div", {
   style: {
     width: "100%",
-    background: "rgba(255,255,255,0.07)",
+    background: th?.border || "rgba(128,128,128,0.15)",
     borderRadius: h,
     height: h,
     overflow: "hidden"
@@ -766,13 +896,13 @@ const Bdg = ({
   style: {
     padding: "3px 9px",
     borderRadius: 20,
-    background: `${color}1e`,
+    background: `${color}22`,
     color,
     fontSize: 11,
     fontWeight: 700,
     letterSpacing: "0.04em",
     textTransform: "uppercase",
-    border: `1px solid ${color}3a`,
+    border: `1px solid ${color}44`,
     whiteSpace: "nowrap",
     display: "inline-flex",
     alignItems: "center"
@@ -782,144 +912,161 @@ const Crd = ({
   children,
   style,
   onClick,
-  ac
-}) => /*#__PURE__*/React.createElement("div", {
-  onClick: onClick,
-  style: {
-    background: "rgba(255,255,255,0.028)",
-    border: `1px solid ${ac ? `${ac}22` : "rgba(255,255,255,0.07)"}`,
-    borderRadius: 16,
-    overflow: "hidden",
-    cursor: onClick ? "pointer" : "default",
-    transition: "background 0.15s",
-    ...style
-  },
-  onMouseEnter: e => {
-    if (onClick) e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-  },
-  onMouseLeave: e => {
-    if (onClick) e.currentTarget.style.background = "rgba(255,255,255,0.028)";
-  }
-}, children);
+  ac,
+  th
+}) => {
+  const T = th || DARK;
+  return /*#__PURE__*/React.createElement("div", {
+    onClick: onClick,
+    style: {
+      background: T.surface,
+      border: `1px solid ${ac ? `${ac}22` : T.border}`,
+      borderRadius: 16,
+      overflow: "hidden",
+      cursor: onClick ? "pointer" : "default",
+      transition: "background 0.15s, box-shadow 0.15s",
+      ...style
+    },
+    onMouseEnter: e => {
+      if (onClick) {
+        e.currentTarget.style.boxShadow = T.shadow;
+      }
+    },
+    onMouseLeave: e => {
+      if (onClick) {
+        e.currentTarget.style.boxShadow = "none";
+      }
+    }
+  }, children);
+};
 const Stat = ({
   icon,
   label,
   value,
   sub,
-  color = "#C9A84C"
-}) => /*#__PURE__*/React.createElement(Crd, {
-  style: {
-    padding: "16px 14px",
-    position: "relative",
-    overflow: "hidden"
-  }
-}, /*#__PURE__*/React.createElement("div", {
-  style: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    width: 56,
-    height: 56,
-    background: `radial-gradient(circle at top right, ${color}18, transparent 70%)`
-  }
-}), /*#__PURE__*/React.createElement("div", {
-  style: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10
-  }
-}, /*#__PURE__*/React.createElement("div", {
-  style: {
-    width: 38,
-    height: 38,
-    borderRadius: 11,
-    background: `${color}18`,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color,
-    flexShrink: 0
-  }
-}, /*#__PURE__*/React.createElement(Ic, {
-  n: icon,
-  s: 18
-})), /*#__PURE__*/React.createElement("div", {
-  style: {
-    minWidth: 0
-  }
-}, /*#__PURE__*/React.createElement("div", {
-  style: {
-    fontSize: 10,
-    color: "rgba(255,255,255,0.4)",
-    letterSpacing: "0.07em",
-    textTransform: "uppercase",
-    marginBottom: 1,
-    fontFamily: "'Crimson Pro',serif",
-    fontStyle: "italic"
-  }
-}, label), /*#__PURE__*/React.createElement("div", {
-  style: {
-    fontSize: 22,
-    fontWeight: 800,
-    color: "#fff",
-    fontFamily: "'Playfair Display',serif",
-    lineHeight: 1
-  }
-}, value ?? "—"), sub && /*#__PURE__*/React.createElement("div", {
-  style: {
-    fontSize: 10,
-    color: "rgba(255,255,255,0.32)",
-    marginTop: 2
-  }
-}, sub))));
+  color = "#C9A84C",
+  th
+}) => {
+  const T = th || DARK;
+  return /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: "16px 14px",
+      position: "relative",
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      top: 0,
+      right: 0,
+      width: 56,
+      height: 56,
+      background: `radial-gradient(circle at top right, ${color}20, transparent 70%)`
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 38,
+      height: 38,
+      borderRadius: 11,
+      background: `${color}18`,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color,
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: icon,
+    s: 18
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      minWidth: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: T.text3,
+      letterSpacing: "0.07em",
+      textTransform: "uppercase",
+      marginBottom: 1,
+      fontFamily: "'Crimson Pro',serif",
+      fontStyle: "italic"
+    }
+  }, label), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 22,
+      fontWeight: 800,
+      color: T.text,
+      fontFamily: "'Playfair Display',serif",
+      lineHeight: 1
+    }
+  }, value ?? '—'), sub && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: T.text3,
+      marginTop: 2
+    }
+  }, sub))));
+};
 const Row = ({
   left,
   title,
   sub,
   right,
-  onClick
-}) => /*#__PURE__*/React.createElement("div", {
-  onClick: onClick,
-  style: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-    padding: "13px 0",
-    borderBottom: "1px solid rgba(255,255,255,0.042)",
-    cursor: onClick ? "pointer" : "default"
-  }
-}, left && /*#__PURE__*/React.createElement("div", {
-  style: {
-    flexShrink: 0
-  }
-}, left), /*#__PURE__*/React.createElement("div", {
-  style: {
-    flex: 1,
-    minWidth: 0
-  }
-}, /*#__PURE__*/React.createElement("div", {
-  style: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: 500,
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap"
-  }
-}, title), sub && /*#__PURE__*/React.createElement("div", {
-  style: {
-    color: "rgba(255,255,255,0.38)",
-    fontSize: 12,
-    marginTop: 2,
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap"
-  }
-}, sub)), right && /*#__PURE__*/React.createElement("div", {
-  style: {
-    flexShrink: 0
-  }
-}, right));
+  onClick,
+  th
+}) => {
+  const T = th || DARK;
+  return /*#__PURE__*/React.createElement("div", {
+    onClick: onClick,
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      padding: "13px 0",
+      borderBottom: `1px solid ${T.rowBorder}`,
+      cursor: onClick ? "pointer" : "default"
+    }
+  }, left && /*#__PURE__*/React.createElement("div", {
+    style: {
+      flexShrink: 0
+    }
+  }, left), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      minWidth: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.text,
+      fontSize: 14,
+      fontWeight: 500,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap"
+    }
+  }, title), sub && /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.text3,
+      fontSize: 12,
+      marginTop: 2,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap"
+    }
+  }, sub)), right && /*#__PURE__*/React.createElement("div", {
+    style: {
+      flexShrink: 0
+    }
+  }, right));
+};
 const Av = ({
   name,
   color = "#C9A84C",
@@ -930,8 +1077,8 @@ const Av = ({
     width: size,
     height: size,
     borderRadius: size * 0.28,
-    background: `${color}1c`,
-    border: `1px solid ${color}33`,
+    background: `${color}18`,
+    border: `1.5px solid ${color}33`,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -944,218 +1091,217 @@ const Av = ({
 const SH = ({
   title,
   color = "#C9A84C",
-  action
-}) => /*#__PURE__*/React.createElement("div", {
-  style: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 14
-  }
-}, /*#__PURE__*/React.createElement("h3", {
-  style: {
-    fontFamily: "'Playfair Display',serif",
-    color,
-    fontSize: 17,
-    margin: 0,
-    fontWeight: 700
-  }
-}, title), action);
+  action,
+  th
+}) => {
+  const T = th || DARK;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontFamily: "'Playfair Display',serif",
+      color,
+      fontSize: 17,
+      margin: 0,
+      fontWeight: 700
+    }
+  }, title), action);
+};
 const IR = ({
   label,
-  value
-}) => /*#__PURE__*/React.createElement("div", {
-  style: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    padding: "10px 0",
-    borderBottom: "1px solid rgba(255,255,255,0.042)",
-    gap: 12
-  }
-}, /*#__PURE__*/React.createElement("span", {
-  style: {
-    color: "rgba(255,255,255,0.38)",
-    fontSize: 13,
-    flexShrink: 0
-  }
-}, label), /*#__PURE__*/React.createElement("span", {
-  style: {
-    color: "rgba(255,255,255,0.85)",
-    fontSize: 13,
-    fontWeight: 500,
-    textAlign: "right"
-  }
-}, value));
+  value,
+  th
+}) => {
+  const T = th || DARK;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      padding: "10px 0",
+      borderBottom: `1px solid ${T.rowBorder}`,
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: T.text3,
+      fontSize: 13,
+      flexShrink: 0
+    }
+  }, label), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: T.text,
+      fontSize: 13,
+      fontWeight: 500,
+      textAlign: "right"
+    }
+  }, value));
+};
 const Modal = ({
   title,
   onClose,
   children,
-  accent = "#C9A84C"
-}) => /*#__PURE__*/React.createElement("div", {
-  style: {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,0.75)",
-    backdropFilter: "blur(12px)",
-    zIndex: 2000,
-    display: "flex",
-    alignItems: "flex-end",
-    justifyContent: "center"
-  },
-  onClick: e => e.target === e.currentTarget && onClose()
-}, /*#__PURE__*/React.createElement("div", {
-  style: {
-    background: "#131313",
-    border: `1px solid ${accent}28`,
-    borderRadius: "22px 22px 0 0",
-    width: "100%",
-    maxWidth: 640,
-    maxHeight: "90vh",
-    overflowY: "auto",
-    animation: "slideUp 0.28s ease",
-    paddingBottom: "env(safe-area-inset-bottom,0)"
-  }
-}, /*#__PURE__*/React.createElement("div", {
-  style: {
-    position: "sticky",
-    top: 0,
-    background: "#131313",
-    padding: "12px 20px 0",
-    zIndex: 1
-  }
-}, /*#__PURE__*/React.createElement("div", {
-  style: {
-    width: 38,
-    height: 4,
-    background: "rgba(255,255,255,0.14)",
-    borderRadius: 2,
-    margin: "0 auto 14px"
-  }
-}), /*#__PURE__*/React.createElement("div", {
-  style: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingBottom: 12,
-    borderBottom: `1px solid ${accent}20`
-  }
-}, /*#__PURE__*/React.createElement("h2", {
-  style: {
-    fontSize: 19,
-    fontFamily: "'Playfair Display',serif",
-    color: accent,
-    margin: 0,
-    fontWeight: 700
-  }
-}, title), /*#__PURE__*/React.createElement("button", {
-  onClick: onClose,
-  style: {
-    background: "rgba(255,255,255,0.08)",
-    border: "none",
-    borderRadius: 10,
-    width: 34,
-    height: 34,
-    cursor: "pointer",
-    color: "rgba(255,255,255,0.7)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center"
-  }
-}, /*#__PURE__*/React.createElement(Ic, {
-  n: "x",
-  s: 15
-})))), /*#__PURE__*/React.createElement("div", {
-  style: {
-    padding: "16px 20px 24px"
-  }
-}, children)));
-
-// ─── FORM FIELD ───────────────────────────────────────────────────────────────
+  accent = "#C9A84C",
+  th
+}) => {
+  const T = th || DARK;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.72)",
+      backdropFilter: "blur(12px)",
+      zIndex: 2000,
+      display: "flex",
+      alignItems: "flex-end",
+      justifyContent: "center"
+    },
+    onClick: e => e.target === e.currentTarget && onClose()
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: T.bg2,
+      border: `1px solid ${accent}28`,
+      borderRadius: "22px 22px 0 0",
+      width: "100%",
+      maxWidth: 640,
+      maxHeight: "92vh",
+      overflowY: "auto",
+      animation: "slideUp 0.28s ease",
+      paddingBottom: "env(safe-area-inset-bottom,0)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "sticky",
+      top: 0,
+      background: T.bg2,
+      padding: "12px 20px 0",
+      zIndex: 1
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 38,
+      height: 4,
+      background: T.border,
+      borderRadius: 2,
+      margin: "0 auto 14px"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingBottom: 12,
+      borderBottom: `1px solid ${T.border}`
+    }
+  }, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: 19,
+      fontFamily: "'Playfair Display',serif",
+      color: accent,
+      margin: 0,
+      fontWeight: 700
+    }
+  }, title), /*#__PURE__*/React.createElement("button", {
+    onClick: onClose,
+    style: {
+      background: T.input,
+      border: "none",
+      borderRadius: 10,
+      width: 34,
+      height: 34,
+      cursor: "pointer",
+      color: T.text2,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center"
+    }
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: "x",
+    s: 15
+  })))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "16px 20px 24px"
+    }
+  }, children)));
+};
 const Field = ({
   label,
   value,
   onChange,
   type = "text",
   options,
-  required
-}) => /*#__PURE__*/React.createElement("div", {
-  style: {
-    marginBottom: 14
-  }
-}, /*#__PURE__*/React.createElement("label", {
-  style: {
-    color: "rgba(255,255,255,0.45)",
-    fontSize: 11,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-    display: "block",
-    marginBottom: 6
-  }
-}, label, required && " *"), options ? /*#__PURE__*/React.createElement("select", {
-  value: value,
-  onChange: e => onChange(e.target.value),
-  style: {
+  required,
+  th
+}) => {
+  const T = th || DARK;
+  const base = {
     width: "100%",
     padding: "11px 14px",
-    background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: T.input,
+    border: `1px solid ${T.inputBorder}`,
     borderRadius: 11,
-    color: "#fff",
+    color: T.text,
     fontSize: 14,
     outline: "none",
     WebkitAppearance: "none",
-    cursor: "pointer"
-  }
-}, /*#__PURE__*/React.createElement("option", {
-  value: "",
-  style: {
-    background: "#1a1a1a"
-  }
-}, "Select\u2026"), options.map(o => /*#__PURE__*/React.createElement("option", {
-  key: o,
-  value: o,
-  style: {
-    background: "#1a1a1a"
-  }
-}, o))) : type === "textarea" ? /*#__PURE__*/React.createElement("textarea", {
-  value: value,
-  onChange: e => onChange(e.target.value),
-  rows: 3,
-  style: {
-    width: "100%",
-    padding: "11px 14px",
-    background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 11,
-    color: "#fff",
-    fontSize: 14,
-    outline: "none",
-    resize: "vertical",
-    fontFamily: "Inter, sans-serif",
-    boxSizing: "border-box"
-  },
-  onFocus: e => e.target.style.borderColor = "#C9A84C",
-  onBlur: e => e.target.style.borderColor = "rgba(255,255,255,0.1)"
-}) : /*#__PURE__*/React.createElement("input", {
-  type: type,
-  value: value,
-  onChange: e => onChange(e.target.value),
-  style: {
-    width: "100%",
-    padding: "11px 14px",
-    background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 11,
-    color: "#fff",
-    fontSize: 14,
-    outline: "none",
     boxSizing: "border-box",
-    WebkitAppearance: "none"
-  },
-  onFocus: e => e.target.style.borderColor = "#C9A84C",
-  onBlur: e => e.target.style.borderColor = "rgba(255,255,255,0.1)"
-}));
+    fontFamily: "Inter,sans-serif"
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      color: T.text3,
+      fontSize: 11,
+      letterSpacing: "0.08em",
+      textTransform: "uppercase",
+      display: "block",
+      marginBottom: 6
+    }
+  }, label, required && " *"), options ? /*#__PURE__*/React.createElement("select", {
+    value: value,
+    onChange: e => onChange(e.target.value),
+    style: {
+      ...base,
+      cursor: "pointer"
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "",
+    style: {
+      background: T.bg2
+    }
+  }, "Select\u2026"), options.map(o => /*#__PURE__*/React.createElement("option", {
+    key: typeof o === "object" ? o.value : o,
+    value: typeof o === "object" ? o.value : o,
+    style: {
+      background: T.bg2
+    }
+  }, typeof o === "object" ? o.label : o))) : type === "textarea" ? /*#__PURE__*/React.createElement("textarea", {
+    value: value,
+    onChange: e => onChange(e.target.value),
+    rows: 3,
+    style: {
+      ...base,
+      resize: "vertical"
+    },
+    onFocus: e => e.target.style.borderColor = "#C9A84C",
+    onBlur: e => e.target.style.borderColor = T.inputBorder
+  }) : /*#__PURE__*/React.createElement("input", {
+    type: type,
+    value: value,
+    onChange: e => onChange(e.target.value),
+    style: base,
+    onFocus: e => e.target.style.borderColor = "#C9A84C",
+    onBlur: e => e.target.style.borderColor = T.inputBorder
+  }));
+};
 const Btn = ({
   children,
   onClick,
@@ -1163,48 +1309,56 @@ const Btn = ({
   outline,
   icon,
   disabled,
-  style: st
-}) => /*#__PURE__*/React.createElement("button", {
-  onClick: onClick,
-  disabled: disabled,
-  style: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 7,
-    padding: "10px 18px",
-    borderRadius: 11,
-    border: outline ? `1.5px solid ${color}55` : "none",
-    background: outline ? "transparent" : `linear-gradient(135deg, ${color}, ${color}bb)`,
-    color: outline ? color : color === "#C9A84C" ? "#000" : "#fff",
-    fontWeight: 700,
-    fontSize: 13,
-    cursor: disabled ? "not-allowed" : "pointer",
-    opacity: disabled ? 0.5 : 1,
-    transition: "opacity 0.2s",
-    WebkitTapHighlightColor: "transparent",
-    ...st
-  }
-}, icon && /*#__PURE__*/React.createElement(Ic, {
-  n: icon,
-  s: 15
-}), children);
-const Spinner = () => /*#__PURE__*/React.createElement("div", {
-  style: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 40
-  }
-}, /*#__PURE__*/React.createElement("div", {
-  style: {
-    width: 32,
-    height: 32,
-    border: "3px solid rgba(255,255,255,0.1)",
-    borderTopColor: "#C9A84C",
-    borderRadius: "50%",
-    animation: "spin 0.8s linear infinite"
-  }
-}));
+  style: st,
+  th
+}) => {
+  const T = th || DARK;
+  return /*#__PURE__*/React.createElement("button", {
+    onClick: onClick,
+    disabled: disabled,
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 7,
+      padding: "10px 18px",
+      borderRadius: 11,
+      border: outline ? `1.5px solid ${color}55` : "none",
+      background: outline ? "transparent" : `linear-gradient(135deg,${color},${color}bb)`,
+      color: outline ? color : color === "#C9A84C" || color === "#B8860B" ? "#000" : "#fff",
+      fontWeight: 700,
+      fontSize: 13,
+      cursor: disabled ? "not-allowed" : "pointer",
+      opacity: disabled ? 0.5 : 1,
+      WebkitTapHighlightColor: "transparent",
+      ...st
+    }
+  }, icon && /*#__PURE__*/React.createElement(Ic, {
+    n: icon,
+    s: 15
+  }), children);
+};
+const Spinner = ({
+  th
+}) => {
+  const T = th || DARK;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 40
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 32,
+      height: 32,
+      border: `3px solid ${T.border}`,
+      borderTopColor: "#C9A84C",
+      borderRadius: "50%",
+      animation: "spin 0.8s linear infinite"
+    }
+  }));
+};
 const Toast = ({
   msg,
   type
@@ -1228,11 +1382,13 @@ const Toast = ({
 }, msg);
 
 // ══════════════════════════════════════════════════════════════════════════════
-// LOGIN PAGE
+// LOGIN
 // ══════════════════════════════════════════════════════════════════════════════
 const Login = ({
-  onLogin
+  onLogin,
+  th
 }) => {
+  const T = th || DARK;
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [loading, setLoading] = useState(false);
@@ -1250,7 +1406,6 @@ const Login = ({
     try {
       const data = await sb.signIn(email, pass);
       sb.setToken(data.access_token);
-      // Get profile to determine role
       const profiles = await sb.select("profiles", `?user_id=eq.${data.user.id}`);
       if (!profiles.length) throw new Error("No profile found. Contact admin.");
       onLogin({
@@ -1267,7 +1422,7 @@ const Login = ({
   return /*#__PURE__*/React.createElement("div", {
     style: {
       minHeight: "100dvh",
-      background: "#080808",
+      background: T.bg,
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -1280,13 +1435,13 @@ const Login = ({
     style: {
       position: "absolute",
       inset: 0,
-      backgroundImage: "radial-gradient(ellipse 90% 55% at 50% -5%, rgba(201,168,76,0.2), transparent), radial-gradient(ellipse 50% 40% at 90% 110%, rgba(96,165,250,0.09), transparent)"
+      backgroundImage: `radial-gradient(ellipse 90% 55% at 50% -5%, ${T.gold}28, transparent), radial-gradient(ellipse 50% 40% at 90% 110%, rgba(96,165,250,0.1), transparent)`
     }
-  }), /*#__PURE__*/React.createElement("div", {
+  }), T === DARK && /*#__PURE__*/React.createElement("div", {
     style: {
       position: "absolute",
       inset: 0,
-      backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.014) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.014) 40px)"
+      backgroundImage: "repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.012) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.012) 40px)"
     }
   }), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1304,12 +1459,13 @@ const Login = ({
       width: 72,
       height: 72,
       borderRadius: "50%",
-      background: "linear-gradient(135deg, #C9A84C, #8B6914)",
+      background: `linear-gradient(135deg,${T.gold},${T.gold}99)`,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       margin: "0 auto 14px",
-      boxShadow: "0 0 50px rgba(201,168,76,0.38)"
+      boxShadow: `0 0 50px ${T.gold}55`,
+      color: "#fff"
     }
   }, /*#__PURE__*/React.createElement(Ic, {
     n: "music",
@@ -1318,13 +1474,13 @@ const Login = ({
     style: {
       fontSize: isMobile ? 24 : 28,
       fontFamily: "'Playfair Display',serif",
-      color: "#fff",
+      color: T.text,
       margin: "0 0 5px",
       fontWeight: 800
     }
   }, "Misbah And Friends"), /*#__PURE__*/React.createElement("p", {
     style: {
-      color: "rgba(255,255,255,0.33)",
+      color: T.text3,
       fontSize: 11,
       margin: 0,
       letterSpacing: "0.13em",
@@ -1332,21 +1488,24 @@ const Login = ({
     }
   }, "Music School \xB7 Learning Portal")), /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "rgba(255,255,255,0.03)",
-      border: "1px solid rgba(255,255,255,0.08)",
+      background: T.surface,
+      border: `1px solid ${T.border}`,
       borderRadius: 22,
-      padding: isMobile ? "22px 18px" : "28px 26px"
+      padding: isMobile ? "22px 18px" : "28px 26px",
+      boxShadow: T.shadow
     }
   }, /*#__PURE__*/React.createElement(Field, {
     label: "Email",
     value: email,
     onChange: setEmail,
-    type: "email"
+    type: "email",
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Password",
     value: pass,
     onChange: setPass,
-    type: "password"
+    type: "password",
+    th: th
   }), err && /*#__PURE__*/React.createElement("div", {
     style: {
       color: "#f87171",
@@ -1354,7 +1513,8 @@ const Login = ({
       marginBottom: 12,
       padding: "10px 14px",
       background: "rgba(248,113,113,0.1)",
-      borderRadius: 8
+      borderRadius: 8,
+      border: "1px solid rgba(248,113,113,0.2)"
     }
   }, err), /*#__PURE__*/React.createElement("button", {
     onClick: handleLogin,
@@ -1363,7 +1523,7 @@ const Login = ({
       width: "100%",
       padding: "15px",
       borderRadius: 14,
-      background: "linear-gradient(135deg, #C9A84C, #8B6914)",
+      background: `linear-gradient(135deg,${T.gold},${T.gold}99)`,
       border: "none",
       color: "#000",
       fontWeight: 800,
@@ -1374,7 +1534,7 @@ const Login = ({
     }
   }, loading ? "Signing in…" : "Sign In"), /*#__PURE__*/React.createElement("p", {
     style: {
-      color: "rgba(255,255,255,0.22)",
+      color: T.text3,
       fontSize: 11,
       textAlign: "center",
       marginTop: 14
@@ -1383,12 +1543,16 @@ const Login = ({
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
-// NAV COMPONENTS
+// NAV
 // ══════════════════════════════════════════════════════════════════════════════
 const MobHeader = ({
   role,
-  title
+  title,
+  th,
+  darkMode,
+  setDarkMode
 }) => {
+  const T = th || DARK;
   const c = rc(role);
   const sub = {
     admin: "Administration",
@@ -1397,9 +1561,9 @@ const MobHeader = ({
   }[role];
   return /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "rgba(8,8,8,0.97)",
+      background: T.navBg,
       backdropFilter: "blur(24px)",
-      borderBottom: "1px solid rgba(255,255,255,0.06)",
+      borderBottom: `1px solid ${T.border}`,
       padding: "12px 16px",
       display: "flex",
       alignItems: "center",
@@ -1415,11 +1579,12 @@ const MobHeader = ({
       width: 32,
       height: 32,
       borderRadius: 9,
-      background: `linear-gradient(135deg, ${c}, ${c}88)`,
+      background: `linear-gradient(135deg,${c},${c}88)`,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      flexShrink: 0
+      flexShrink: 0,
+      color: "#fff"
     }
   }, /*#__PURE__*/React.createElement(Ic, {
     n: "music",
@@ -1433,7 +1598,7 @@ const MobHeader = ({
     style: {
       fontSize: 16,
       fontWeight: 800,
-      color: "#fff",
+      color: T.text,
       fontFamily: "'Playfair Display',serif"
     }
   }, title), /*#__PURE__*/React.createElement("div", {
@@ -1443,22 +1608,33 @@ const MobHeader = ({
       textTransform: "uppercase",
       letterSpacing: "0.08em"
     }
-  }, "Misbah & Friends \xB7 ", sub)), /*#__PURE__*/React.createElement("div", {
+  }, "Misbah & Friends \xB7 ", sub)), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setDarkMode(!darkMode),
     style: {
-      width: 8,
-      height: 8,
-      borderRadius: "50%",
-      background: "#4ade80",
-      boxShadow: "0 0 7px #4ade80",
+      width: 32,
+      height: 32,
+      borderRadius: 8,
+      background: T.input,
+      border: `1px solid ${T.border}`,
+      cursor: "pointer",
+      color: T.text2,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
       flexShrink: 0
     }
-  }));
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: darkMode ? "sun" : "moon",
+    s: 15
+  })));
 };
 const BotNav = ({
   role,
   page,
-  setPage
+  setPage,
+  th
 }) => {
+  const T = th || DARK;
   const maps = {
     admin: [{
       key: "dashboard",
@@ -1469,13 +1645,13 @@ const BotNav = ({
       label: "Students",
       icon: "users"
     }, {
+      key: "payments",
+      label: "Payments",
+      icon: "credit"
+    }, {
       key: "classes",
       label: "Classes",
       icon: "music"
-    }, {
-      key: "workhours",
-      label: "Hours",
-      icon: "clock"
     }, {
       key: "more",
       label: "More",
@@ -1531,9 +1707,9 @@ const BotNav = ({
       bottom: 0,
       left: 0,
       right: 0,
-      background: "rgba(8,8,8,0.97)",
+      background: T.navBg,
       backdropFilter: "blur(24px)",
-      borderTop: "1px solid rgba(255,255,255,0.07)",
+      borderTop: `1px solid ${T.border}`,
       display: "flex",
       zIndex: 500,
       paddingBottom: "env(safe-area-inset-bottom,0)"
@@ -1553,7 +1729,7 @@ const BotNav = ({
         border: "none",
         background: "transparent",
         cursor: "pointer",
-        color: active ? c : "rgba(255,255,255,0.3)",
+        color: active ? c : T.text3,
         transition: "color 0.15s",
         WebkitTapHighlightColor: "transparent",
         gap: 3,
@@ -1585,8 +1761,11 @@ const MoreDrawer = ({
   role,
   setPage,
   onLogout,
-  onClose
+  onClose,
+  th
 }) => {
+  const T = th || DARK;
+  const c = rc(role);
   const extras = {
     admin: [{
       key: "professors",
@@ -1609,6 +1788,10 @@ const MoreDrawer = ({
       label: "Manage Users",
       icon: "user"
     }, {
+      key: "exports",
+      label: "Export Data",
+      icon: "download"
+    }, {
       key: "settings",
       label: "Settings",
       icon: "settings"
@@ -1628,7 +1811,6 @@ const MoreDrawer = ({
       icon: "calendar"
     }]
   };
-  const c = rc(role);
   return /*#__PURE__*/React.createElement("div", {
     style: {
       position: "fixed",
@@ -1642,7 +1824,7 @@ const MoreDrawer = ({
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       width: "100%",
-      background: "#111",
+      background: T.bg2,
       borderRadius: "20px 20px 0 0",
       paddingBottom: "calc(env(safe-area-inset-bottom,0) + 82px)",
       animation: "slideUp 0.24s ease"
@@ -1651,7 +1833,7 @@ const MoreDrawer = ({
     style: {
       width: 38,
       height: 4,
-      background: "rgba(255,255,255,0.14)",
+      background: T.border,
       borderRadius: 2,
       margin: "10px auto 16px"
     }
@@ -1669,7 +1851,7 @@ const MoreDrawer = ({
       padding: "15px 22px",
       border: "none",
       background: "transparent",
-      color: "rgba(255,255,255,0.8)",
+      color: T.text,
       cursor: "pointer",
       fontSize: 16,
       WebkitTapHighlightColor: "transparent"
@@ -1696,7 +1878,7 @@ const MoreDrawer = ({
   }, item.label))), /*#__PURE__*/React.createElement("div", {
     style: {
       height: 1,
-      background: "rgba(255,255,255,0.07)",
+      background: T.border,
       margin: "6px 22px"
     }
   }), /*#__PURE__*/React.createElement("button", {
@@ -1740,8 +1922,13 @@ const Sidebar = ({
   setPage,
   onLogout,
   collapsed,
-  setCollapsed
+  setCollapsed,
+  th,
+  darkMode,
+  setDarkMode
 }) => {
+  const T = th || DARK;
+  const c = rc(role);
   const maps = {
     admin: [{
       key: "dashboard",
@@ -1760,6 +1947,10 @@ const Sidebar = ({
       label: "Classes",
       icon: "music"
     }, {
+      key: "payments",
+      label: "Payments",
+      icon: "credit"
+    }, {
       key: "schedule",
       label: "Schedule",
       icon: "calendar"
@@ -1775,6 +1966,10 @@ const Sidebar = ({
       key: "events",
       label: "Events",
       icon: "bell"
+    }, {
+      key: "exports",
+      label: "Export Data",
+      icon: "download"
     }, {
       key: "users",
       label: "Manage Users",
@@ -1835,7 +2030,6 @@ const Sidebar = ({
       icon: "msg"
     }]
   };
-  const c = rc(role);
   const sub = {
     admin: "Administration",
     professor: "Professor",
@@ -1843,19 +2037,20 @@ const Sidebar = ({
   }[role];
   return /*#__PURE__*/React.createElement("aside", {
     style: {
-      width: collapsed ? 60 : 228,
+      width: collapsed ? 60 : 232,
       flexShrink: 0,
-      background: "#090909",
-      borderRight: "1px solid rgba(255,255,255,0.055)",
+      background: T.sidebarBg,
+      borderRight: `1px solid ${T.sidebarBorder}`,
       display: "flex",
       flexDirection: "column",
       transition: "width 0.3s ease",
-      overflow: "hidden"
+      overflow: "hidden",
+      boxShadow: T === LIGHT ? "2px 0 12px rgba(0,0,0,0.06)" : "none"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       padding: collapsed ? "18px 12px" : "20px 16px",
-      borderBottom: "1px solid rgba(255,255,255,0.055)"
+      borderBottom: `1px solid ${T.sidebarBorder}`
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1868,11 +2063,12 @@ const Sidebar = ({
       width: 32,
       height: 32,
       borderRadius: 9,
-      background: `linear-gradient(135deg, ${c}, ${c}88)`,
+      background: `linear-gradient(135deg,${c},${c}88)`,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      flexShrink: 0
+      flexShrink: 0,
+      color: "#fff"
     }
   }, /*#__PURE__*/React.createElement(Ic, {
     n: "music",
@@ -1881,7 +2077,7 @@ const Sidebar = ({
     style: {
       fontSize: 13,
       fontWeight: 700,
-      color: "#fff",
+      color: T.text,
       fontFamily: "'Playfair Display',serif",
       whiteSpace: "nowrap"
     }
@@ -1915,12 +2111,12 @@ const Sidebar = ({
         border: "none",
         marginBottom: 1,
         background: active ? `${c}18` : "transparent",
-        color: active ? c : "rgba(255,255,255,0.4)",
+        color: active ? c : T.text2,
         justifyContent: collapsed ? "center" : "flex-start",
         transition: "all 0.12s"
       },
       onMouseEnter: e => {
-        if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+        if (!active) e.currentTarget.style.background = T === LIGHT ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)";
       },
       onMouseLeave: e => {
         if (!active) e.currentTarget.style.background = "transparent";
@@ -1946,9 +2142,32 @@ const Sidebar = ({
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "8px 6px",
-      borderTop: "1px solid rgba(255,255,255,0.055)"
+      borderTop: `1px solid ${T.sidebarBorder}`
     }
   }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setDarkMode(!darkMode),
+    style: {
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: collapsed ? "center" : "flex-start",
+      gap: 10,
+      padding: collapsed ? "9px" : "9px 11px",
+      borderRadius: 9,
+      cursor: "pointer",
+      border: "none",
+      background: "transparent",
+      color: T.text2,
+      marginBottom: 1
+    }
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: darkMode ? "sun" : "moon",
+    s: 15
+  }), !collapsed && /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12
+    }
+  }, darkMode ? "Light Mode" : "Dark Mode")), /*#__PURE__*/React.createElement("button", {
     onClick: () => setCollapsed(!collapsed),
     style: {
       width: "100%",
@@ -1961,7 +2180,7 @@ const Sidebar = ({
       cursor: "pointer",
       border: "none",
       background: "transparent",
-      color: "rgba(255,255,255,0.22)",
+      color: T.text3,
       marginBottom: 1
     }
   }, /*#__PURE__*/React.createElement("span", {
@@ -2003,22 +2222,501 @@ const Sidebar = ({
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
-// ADMIN — STUDENTS (full CRUD)
+// PAYMENTS PAGE
+// ══════════════════════════════════════════════════════════════════════════════
+const PaymentsPage = ({
+  role,
+  toast,
+  th
+}) => {
+  const T = th || DARK;
+  const [payments, setPayments] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState(null);
+  const [form, setForm] = useState({
+    student_id: "",
+    student_name: "",
+    month: "",
+    year: new Date().getFullYear(),
+    amount: "",
+    method: "cash",
+    notes: ""
+  });
+  const [saving, setSaving] = useState(false);
+  const [filterStudent, setFilterStudent] = useState("");
+  const load = async () => {
+    setLoading(true);
+    try {
+      const [p, s] = await Promise.all([sb.select("payments", "?order=year.desc,month"), sb.select("students", "?order=name")]);
+      setPayments(p);
+      setStudents(s);
+    } catch (e) {
+      toast(e.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    load();
+  }, []);
+  const save = async () => {
+    if (!form.student_id || !form.month || !form.amount) {
+      toast("Student, month and amount required", "error");
+      return;
+    }
+    setSaving(true);
+    try {
+      const s = students.find(x => x.id === form.student_id);
+      const payload = {
+        ...form,
+        student_name: s?.name || "",
+        amount: Number(form.amount)
+      };
+      if (modal === "add") {
+        await sb.insert("payments", payload);
+        toast("Payment recorded!");
+      } else {
+        await sb.update("payments", modal.id, payload);
+        toast("Updated!");
+      }
+      setModal(null);
+      load();
+    } catch (e) {
+      toast(e.message, "error");
+    } finally {
+      setSaving(false);
+    }
+  };
+  const del = async p => {
+    if (!confirm(`Delete payment for ${p.student_name}?`)) return;
+    try {
+      await sb.remove("payments", p.id);
+      toast("Deleted");
+      load();
+    } catch (e) {
+      toast(e.message, "error");
+    }
+  };
+  const filtered = payments.filter(p => !filterStudent || p.student_id === filterStudent);
+  const totalAmount = filtered.reduce((s, p) => s + (p.amount || 0), 0);
+  const methodColor = {
+    cash: "#4ade80",
+    bank: "#60a5fa",
+    card: "#a78bfa"
+  };
+  const currentYear = new Date().getFullYear();
+  const years = [currentYear - 1, currentYear, currentYear + 1];
+
+  // Payment status grid per student
+  const paidMap = {};
+  payments.forEach(p => {
+    const key = `${p.student_id}-${p.month}-${p.year}`;
+    paidMap[key] = true;
+  });
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 18,
+      flexWrap: "wrap",
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 26,
+      fontFamily: "'Playfair Display',serif",
+      color: T.text,
+      margin: "0 0 3px",
+      fontWeight: 800
+    }
+  }, "Payments"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: T.text3,
+      fontSize: 13,
+      margin: 0
+    }
+  }, "Monthly fee tracker")), role === "admin" && /*#__PURE__*/React.createElement(Btn, {
+    onClick: () => {
+      setForm({
+        student_id: "",
+        student_name: "",
+        month: "",
+        year: new Date().getFullYear(),
+        amount: "",
+        method: "cash",
+        notes: ""
+      });
+      setModal("add");
+    },
+    icon: "plus",
+    th: th
+  }, "Record Payment")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr 1fr",
+      gap: 10,
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement(Stat, {
+    icon: "credit",
+    label: "Total Collected",
+    value: `€${totalAmount}`,
+    color: "#4ade80",
+    th: th
+  }), /*#__PURE__*/React.createElement(Stat, {
+    icon: "users",
+    label: "Payments",
+    value: filtered.length,
+    color: "#60a5fa",
+    th: th
+  }), /*#__PURE__*/React.createElement(Stat, {
+    icon: "check",
+    label: "This Month",
+    value: payments.filter(p => p.month === MONTHS[new Date().getMonth()] && p.year === new Date().getFullYear()).length,
+    color: "#C9A84C",
+    th: th
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("select", {
+    value: filterStudent,
+    onChange: e => setFilterStudent(e.target.value),
+    style: {
+      flex: 1,
+      padding: "10px 12px",
+      background: T.input,
+      border: `1px solid ${T.inputBorder}`,
+      borderRadius: 11,
+      color: T.text,
+      fontSize: 13,
+      outline: "none",
+      WebkitAppearance: "none"
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "",
+    style: {
+      background: T.bg2
+    }
+  }, "All Students"), students.map(s => /*#__PURE__*/React.createElement("option", {
+    key: s.id,
+    value: s.id,
+    style: {
+      background: T.bg2
+    }
+  }, s.name)))), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: 16,
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement(SH, {
+    title: "Payment Status \u2014 2026",
+    color: T.gold,
+    th: th
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      overflowX: "auto"
+    }
+  }, /*#__PURE__*/React.createElement("table", {
+    style: {
+      width: "100%",
+      borderCollapse: "collapse",
+      fontSize: 12,
+      minWidth: 600
+    }
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", {
+    style: {
+      borderBottom: `1px solid ${T.border}`
+    }
+  }, /*#__PURE__*/React.createElement("th", {
+    style: {
+      padding: "8px 10px",
+      textAlign: "left",
+      color: T.text3,
+      fontWeight: 600
+    }
+  }, "Student"), MONTHS.map(m => /*#__PURE__*/React.createElement("th", {
+    key: m,
+    style: {
+      padding: "8px 4px",
+      color: T.text3,
+      fontWeight: 600,
+      textAlign: "center",
+      fontSize: 10
+    }
+  }, m.slice(0, 3))))), /*#__PURE__*/React.createElement("tbody", null, students.map(s => /*#__PURE__*/React.createElement("tr", {
+    key: s.id,
+    style: {
+      borderBottom: `1px solid ${T.rowBorder}`
+    }
+  }, /*#__PURE__*/React.createElement("td", {
+    style: {
+      padding: "8px 10px",
+      color: T.text,
+      fontWeight: 500,
+      whiteSpace: "nowrap"
+    }
+  }, s.name), MONTHS.map(m => {
+    const paid = paidMap[`${s.id}-${m}-${currentYear}`];
+    return /*#__PURE__*/React.createElement("td", {
+      key: m,
+      style: {
+        padding: "6px 4px",
+        textAlign: "center"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 22,
+        height: 22,
+        borderRadius: 6,
+        background: paid ? "rgba(74,222,128,0.2)" : "rgba(248,113,113,0.12)",
+        border: `1.5px solid ${paid ? "rgba(74,222,128,0.5)" : "rgba(248,113,113,0.25)"}`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        margin: "0 auto",
+        cursor: role === "admin" ? "pointer" : "default"
+      },
+      title: paid ? `${m} — Paid` : `${m} — Unpaid`,
+      onClick: () => {
+        if (role === "admin") {
+          setForm({
+            student_id: s.id,
+            student_name: s.name,
+            month: m,
+            year: currentYear,
+            amount: "",
+            method: "cash",
+            notes: ""
+          });
+          setModal("add");
+        }
+      }
+    }, paid ? /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: "#4ade80",
+        fontSize: 11
+      }
+    }, "\u2713") : /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: "#f87171",
+        fontSize: 10
+      }
+    }, "\u2717")));
+  }))))))), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: "0 14px"
+    }
+  }, loading ? /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  }) : filtered.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: 24,
+      textAlign: "center",
+      color: T.text3
+    }
+  }, "No payments recorded yet.") : filtered.map(p => /*#__PURE__*/React.createElement(Row, {
+    key: p.id,
+    th: th,
+    left: /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        background: `${methodColor[p.method] || "#C9A84C"}18`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: methodColor[p.method] || "#C9A84C",
+        flexShrink: 0
+      }
+    }, /*#__PURE__*/React.createElement(Ic, {
+      n: "credit",
+      s: 20
+    })),
+    title: p.student_name || "Unknown",
+    sub: `${p.month} ${p.year} · ${p.method || "cash"}${p.notes ? ` · ${p.notes}` : ""}`,
+    right: /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        gap: 6,
+        alignItems: "center"
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 16,
+        fontWeight: 800,
+        color: "#4ade80"
+      }
+    }, "\u20AC", p.amount), /*#__PURE__*/React.createElement(Bdg, {
+      text: p.method || "cash",
+      color: methodColor[p.method] || "#C9A84C"
+    }), role === "admin" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+      onClick: () => {
+        setForm({
+          ...p,
+          amount: String(p.amount)
+        });
+        setModal(p);
+      },
+      style: {
+        width: 28,
+        height: 28,
+        borderRadius: 7,
+        background: "rgba(96,165,250,0.15)",
+        border: "none",
+        cursor: "pointer",
+        color: "#60a5fa",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }
+    }, /*#__PURE__*/React.createElement(Ic, {
+      n: "edit",
+      s: 12
+    })), /*#__PURE__*/React.createElement("button", {
+      onClick: () => del(p),
+      style: {
+        width: 28,
+        height: 28,
+        borderRadius: 7,
+        background: "rgba(248,113,113,0.15)",
+        border: "none",
+        cursor: "pointer",
+        color: "#f87171",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }
+    }, /*#__PURE__*/React.createElement(Ic, {
+      n: "trash",
+      s: 12
+    }))))
+  }))), modal && /*#__PURE__*/React.createElement(Modal, {
+    title: modal === "add" ? "Record Payment" : "Edit Payment",
+    onClose: () => setModal(null),
+    accent: "#4ade80",
+    th: th
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Student",
+    value: form.student_id,
+    onChange: v => setForm(f => ({
+      ...f,
+      student_id: v
+    })),
+    options: students.map(s => ({
+      value: s.id,
+      label: s.name
+    })),
+    required: true,
+    th: th
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: "0 12px"
+    }
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Month",
+    value: form.month,
+    onChange: v => setForm(f => ({
+      ...f,
+      month: v
+    })),
+    options: MONTHS,
+    required: true,
+    th: th
+  }), /*#__PURE__*/React.createElement(Field, {
+    label: "Year",
+    value: String(form.year),
+    onChange: v => setForm(f => ({
+      ...f,
+      year: Number(v)
+    })),
+    options: years.map(String),
+    th: th
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: "0 12px"
+    }
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Amount (\u20AC)",
+    value: form.amount,
+    onChange: v => setForm(f => ({
+      ...f,
+      amount: v
+    })),
+    type: "number",
+    required: true,
+    th: th
+  }), /*#__PURE__*/React.createElement(Field, {
+    label: "Method",
+    value: form.method,
+    onChange: v => setForm(f => ({
+      ...f,
+      method: v
+    })),
+    options: ["cash", "bank", "card"],
+    th: th
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Notes",
+    value: form.notes,
+    onChange: v => setForm(f => ({
+      ...f,
+      notes: v
+    })),
+    type: "textarea",
+    th: th
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10,
+      justifyContent: "flex-end"
+    }
+  }, /*#__PURE__*/React.createElement(Btn, {
+    onClick: () => setModal(null),
+    outline: true,
+    color: T.text2,
+    th: th
+  }, "Cancel"), /*#__PURE__*/React.createElement(Btn, {
+    onClick: save,
+    disabled: saving,
+    icon: "save",
+    color: "#4ade80",
+    th: th
+  }, saving ? "Saving…" : "Save Payment"))));
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// STUDENTS PAGE (with parent link)
 // ══════════════════════════════════════════════════════════════════════════════
 const StudentsPage = ({
   role,
-  toast
+  toast,
+  th
 }) => {
+  const T = th || DARK;
   const [students, setStudents] = useState([]);
+  const [parents, setParents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [modal, setModal] = useState(null); // null | "add" | student object
+  const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
   const load = async () => {
     setLoading(true);
     try {
-      setStudents(await sb.select("students", "?order=name"));
+      const [s, p] = await Promise.all([sb.select("students", "?order=name"), sb.select("profiles", "?role=eq.parent&order=full_name")]);
+      setStudents(s);
+      setParents(p);
     } catch (e) {
       toast(e.message, "error");
     } finally {
@@ -2038,20 +2736,11 @@ const StudentsPage = ({
     parent_name: "",
     parent_email: "",
     parent_phone: "",
+    parent_user_id: "",
     attendance: 0,
     grade: "",
     progress: 0,
     teacher_notes: ""
-  };
-  const openAdd = () => {
-    setForm(blank);
-    setModal("add");
-  };
-  const openEdit = s => {
-    setForm({
-      ...s
-    });
-    setModal(s);
   };
   const save = async () => {
     if (!form.name) {
@@ -2060,12 +2749,23 @@ const StudentsPage = ({
     }
     setSaving(true);
     try {
+      // If a parent profile was selected, fill parent fields from it
+      let payload = {
+        ...form
+      };
+      if (form.parent_user_id) {
+        const p = parents.find(x => x.user_id === form.parent_user_id || x.id === form.parent_user_id);
+        if (p) {
+          payload.parent_name = p.full_name;
+          payload.parent_email = p.email;
+        }
+      }
       if (modal === "add") {
-        await sb.insert("students", form);
+        await sb.insert("students", payload);
         toast("Student added!");
       } else {
-        await sb.update("students", modal.id, form);
-        toast("Student updated!");
+        await sb.update("students", modal.id, payload);
+        toast("Updated!");
       }
       setModal(null);
       load();
@@ -2091,26 +2791,31 @@ const StudentsPage = ({
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 18
+      marginBottom: 18,
+      flexWrap: "wrap",
+      gap: 10
     }
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
       fontFamily: "'Playfair Display',serif",
-      color: "#fff",
+      color: T.text,
       margin: "0 0 3px",
       fontWeight: 800
     }
   }, "Students"), /*#__PURE__*/React.createElement("p", {
     style: {
-      color: "rgba(255,255,255,0.38)",
+      color: T.text3,
       fontSize: 13,
       margin: 0
     }
   }, students.length, " enrolled")), role === "admin" && /*#__PURE__*/React.createElement(Btn, {
-    onClick: openAdd,
+    onClick: () => {
+      setForm(blank);
+      setModal("add");
+    },
     icon: "plus",
-    color: "#C9A84C"
+    th: th
   }, "Add Student")), /*#__PURE__*/React.createElement("div", {
     style: {
       position: "relative",
@@ -2122,7 +2827,7 @@ const StudentsPage = ({
       left: 11,
       top: "50%",
       transform: "translateY(-50%)",
-      color: "rgba(255,255,255,0.28)",
+      color: T.text3,
       pointerEvents: "none"
     }
   }, /*#__PURE__*/React.createElement(Ic, {
@@ -2135,15 +2840,18 @@ const StudentsPage = ({
     style: {
       width: "100%",
       padding: "11px 12px 11px 32px",
-      background: "rgba(255,255,255,0.05)",
-      border: "1px solid rgba(255,255,255,0.09)",
+      background: T.input,
+      border: `1px solid ${T.inputBorder}`,
       borderRadius: 12,
-      color: "#fff",
+      color: T.text,
       fontSize: 14,
       outline: "none",
       boxSizing: "border-box"
     }
-  })), loading ? /*#__PURE__*/React.createElement(Spinner, null) : /*#__PURE__*/React.createElement(Crd, {
+  })), loading ? /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  }) : /*#__PURE__*/React.createElement(Crd, {
+    th: th,
     style: {
       padding: "0 14px"
     }
@@ -2151,17 +2859,18 @@ const StudentsPage = ({
     style: {
       padding: 24,
       textAlign: "center",
-      color: "rgba(255,255,255,0.3)"
+      color: T.text3
     }
   }, "No students found."), filtered.map(s => /*#__PURE__*/React.createElement(Row, {
     key: s.id,
+    th: th,
     left: /*#__PURE__*/React.createElement(Av, {
       name: s.name,
       color: "#C9A84C",
       size: 40
     }),
     title: s.name,
-    sub: `${s.class_name || "—"} · ${s.attendance || 0}% attendance`,
+    sub: `${s.class_name || "—"} · ${s.attendance || 0}% attendance · Parent: ${s.parent_name || "—"}`,
     right: /*#__PURE__*/React.createElement("div", {
       style: {
         display: "flex",
@@ -2172,7 +2881,12 @@ const StudentsPage = ({
       text: s.grade || "—",
       color: "#C9A84C"
     }), role === "admin" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
-      onClick: () => openEdit(s),
+      onClick: () => {
+        setForm({
+          ...s
+        });
+        setModal(s);
+      },
       style: {
         width: 30,
         height: 30,
@@ -2208,7 +2922,8 @@ const StudentsPage = ({
     }))))
   }))), modal && /*#__PURE__*/React.createElement(Modal, {
     title: modal === "add" ? "Add Student" : `Edit: ${modal.name}`,
-    onClose: () => setModal(null)
+    onClose: () => setModal(null),
+    th: th
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
@@ -2226,7 +2941,8 @@ const StudentsPage = ({
       ...f,
       name: v
     })),
-    required: true
+    required: true,
+    th: th
   })), /*#__PURE__*/React.createElement(Field, {
     label: "Date of Birth",
     value: form.dob || "",
@@ -2234,7 +2950,8 @@ const StudentsPage = ({
       ...f,
       dob: v
     })),
-    type: "date"
+    type: "date",
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Instrument",
     value: form.instrument || "",
@@ -2242,7 +2959,8 @@ const StudentsPage = ({
       ...f,
       instrument: v
     })),
-    options: ["Piano", "Guitar", "Violin", "Drums", "Singing", "Viola"]
+    options: ["Piano", "Guitar", "Violin", "Drums", "Singing", "Viola", "Other"],
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Level",
     value: form.level || "",
@@ -2250,28 +2968,32 @@ const StudentsPage = ({
       ...f,
       level: v
     })),
-    options: ["Beginner", "Intermediate", "Advanced"]
+    options: ["Beginner", "Intermediate", "Advanced"],
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Class",
     value: form.class_name || "",
     onChange: v => setForm(f => ({
       ...f,
       class_name: v
-    }))
+    })),
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Academic Year",
     value: form.academic_year || "",
     onChange: v => setForm(f => ({
       ...f,
       academic_year: v
-    }))
+    })),
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Grade",
     value: form.grade || "",
     onChange: v => setForm(f => ({
       ...f,
       grade: v
-    }))
+    })),
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Attendance %",
     value: String(form.attendance || 0),
@@ -2279,42 +3001,76 @@ const StudentsPage = ({
       ...f,
       attendance: Number(v)
     })),
-    type: "number"
-  }), /*#__PURE__*/React.createElement(Field, {
-    label: "Progress %",
-    value: String(form.progress || 0),
-    onChange: v => setForm(f => ({
-      ...f,
-      progress: Number(v)
-    })),
-    type: "number"
+    type: "number",
+    th: th
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       gridColumn: "1/-1"
     }
-  }, /*#__PURE__*/React.createElement(Field, {
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "12px 14px",
+      background: T === LIGHT ? "rgba(167,139,250,0.08)" : "rgba(167,139,250,0.08)",
+      border: "1px solid rgba(167,139,250,0.2)",
+      borderRadius: 11,
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "#a78bfa",
+      fontWeight: 700,
+      textTransform: "uppercase",
+      letterSpacing: "0.07em",
+      marginBottom: 10
+    }
+  }, "Parent / Guardian"), parents.length > 0 && /*#__PURE__*/React.createElement(Field, {
+    label: "Link to Parent Account",
+    value: form.parent_user_id || "",
+    onChange: v => setForm(f => ({
+      ...f,
+      parent_user_id: v
+    })),
+    options: [{
+      value: "",
+      label: "— Select parent account —"
+    }, ...parents.map(p => ({
+      value: p.user_id || p.id,
+      label: `${p.full_name} (${p.email})`
+    }))],
+    th: th
+  }), /*#__PURE__*/React.createElement(Field, {
     label: "Parent Name",
     value: form.parent_name || "",
     onChange: v => setForm(f => ({
       ...f,
       parent_name: v
-    }))
-  })), /*#__PURE__*/React.createElement(Field, {
+    })),
+    th: th
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: "0 12px"
+    }
+  }, /*#__PURE__*/React.createElement(Field, {
     label: "Parent Email",
     value: form.parent_email || "",
     onChange: v => setForm(f => ({
       ...f,
       parent_email: v
     })),
-    type: "email"
+    type: "email",
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Parent Phone",
     value: form.parent_phone || "",
     onChange: v => setForm(f => ({
       ...f,
       parent_phone: v
-    }))
-  }), /*#__PURE__*/React.createElement("div", {
+    })),
+    th: th
+  })))), /*#__PURE__*/React.createElement("div", {
     style: {
       gridColumn: "1/-1"
     }
@@ -2325,32 +3081,584 @@ const StudentsPage = ({
       ...f,
       teacher_notes: v
     })),
-    type: "textarea"
+    type: "textarea",
+    th: th
   }))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 10,
-      justifyContent: "flex-end",
-      marginTop: 4
+      justifyContent: "flex-end"
     }
   }, /*#__PURE__*/React.createElement(Btn, {
     onClick: () => setModal(null),
     outline: true,
-    color: "#ffffff"
+    color: T.text2,
+    th: th
   }, "Cancel"), /*#__PURE__*/React.createElement(Btn, {
     onClick: save,
     disabled: saving,
-    icon: "save"
+    icon: "save",
+    th: th
   }, saving ? "Saving…" : "Save Student"))));
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
-// ADMIN — PROFESSORS (full CRUD)
+// CLASSES PAGE (custom names, live list)
+// ══════════════════════════════════════════════════════════════════════════════
+const ClassesPage = ({
+  role,
+  toast,
+  th
+}) => {
+  const T = th || DARK;
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState(null);
+  const [form, setForm] = useState({});
+  const [saving, setSaving] = useState(false);
+  const load = async () => {
+    setLoading(true);
+    try {
+      setClasses(await sb.select("classes", "?order=name"));
+    } catch (e) {
+      toast(e.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    load();
+  }, []);
+  const blank = {
+    name: "",
+    instrument: "",
+    level: "Beginner",
+    professor: "",
+    students: 0,
+    day: "Monday",
+    time: "09:00",
+    duration: 45,
+    room: ""
+  };
+  const save = async () => {
+    if (!form.name) {
+      toast("Class name required", "error");
+      return;
+    }
+    setSaving(true);
+    try {
+      if (modal === "add") {
+        await sb.insert("classes", form);
+        toast("Class created!");
+      } else {
+        await sb.update("classes", modal.id, form);
+        toast("Updated!");
+      }
+      setModal(null);
+      load();
+    } catch (e) {
+      toast(e.message, "error");
+    } finally {
+      setSaving(false);
+    }
+  };
+  const del = async c => {
+    if (!confirm(`Delete ${c.name}?`)) return;
+    try {
+      await sb.remove("classes", c.id);
+      toast("Deleted");
+      load();
+    } catch (e) {
+      toast(e.message, "error");
+    }
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 18,
+      flexWrap: "wrap",
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 26,
+      fontFamily: "'Playfair Display',serif",
+      color: T.text,
+      margin: "0 0 3px",
+      fontWeight: 800
+    }
+  }, "Classes"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: T.text3,
+      fontSize: 13,
+      margin: 0
+    }
+  }, classes.length, " active \xB7 Custom names supported")), role === "admin" && /*#__PURE__*/React.createElement(Btn, {
+    onClick: () => {
+      setForm(blank);
+      setModal("add");
+    },
+    icon: "plus",
+    color: "#4ade80",
+    th: th
+  }, "New Class")), loading ? /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  }) : /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill,minmax(270px,1fr))",
+      gap: 12
+    }
+  }, classes.length === 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      gridColumn: "1/-1",
+      padding: 40,
+      textAlign: "center",
+      color: T.text3
+    }
+  }, "No classes yet. Create your first one!"), classes.map(c => {
+    const col = lc(c.level);
+    return /*#__PURE__*/React.createElement(Crd, {
+      key: c.id,
+      ac: col,
+      th: th,
+      style: {
+        padding: 16
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        marginBottom: 10
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 28
+      }
+    }, emojiFor(c.instrument)), /*#__PURE__*/React.createElement(Bdg, {
+      text: c.level,
+      color: col
+    })), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 16,
+        fontWeight: 700,
+        color: T.text,
+        fontFamily: "'Playfair Display',serif",
+        marginBottom: 10
+      }
+    }, c.name), /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 4,
+        marginBottom: role === "admin" ? 12 : 0
+      }
+    }, [["Professor", (c.professor || "—").replace("Prof. ", "")], ["Day", c.day || "—"], ["Time", c.time || "—"], ["Room", c.room || "—"], ["Duration", c.duration ? `${c.duration}m` : "—"], ["Students", c.students || 0]].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
+      key: k,
+      style: {
+        fontSize: 12
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: T.text3
+      }
+    }, k, ": "), /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: T.text2,
+        fontWeight: 500
+      }
+    }, v)))), role === "admin" && /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        gap: 8
+      }
+    }, /*#__PURE__*/React.createElement(Btn, {
+      onClick: () => {
+        setForm({
+          ...c
+        });
+        setModal(c);
+      },
+      outline: true,
+      color: col,
+      icon: "edit",
+      style: {
+        flex: 1,
+        justifyContent: "center"
+      },
+      th: th
+    }, "Edit"), /*#__PURE__*/React.createElement(Btn, {
+      onClick: () => del(c),
+      outline: true,
+      color: "#f87171",
+      icon: "trash",
+      style: {
+        flex: 1,
+        justifyContent: "center"
+      },
+      th: th
+    }, "Delete")));
+  })), modal && /*#__PURE__*/React.createElement(Modal, {
+    title: modal === "add" ? "Create New Class" : `Edit: ${modal.name}`,
+    onClose: () => setModal(null),
+    accent: "#4ade80",
+    th: th
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "10px 14px",
+      background: "rgba(74,222,128,0.07)",
+      border: "1px solid rgba(74,222,128,0.2)",
+      borderRadius: 10,
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: T.text2,
+      fontSize: 13,
+      margin: 0
+    }
+  }, "\uD83D\uDCA1 You can type any class name \u2014 e.g. \"Rock Guitar\", \"Jazz Piano\", \"Beginner Vocals\". It will appear everywhere immediately after saving.")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: "0 12px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      gridColumn: "1/-1"
+    }
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Class Name (any name)",
+    value: form.name || "",
+    onChange: v => setForm(f => ({
+      ...f,
+      name: v
+    })),
+    required: true,
+    th: th
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Instrument",
+    value: form.instrument || "",
+    onChange: v => setForm(f => ({
+      ...f,
+      instrument: v
+    })),
+    options: ["Piano", "Guitar", "Violin", "Drums", "Singing", "Viola", "Other"],
+    th: th
+  }), /*#__PURE__*/React.createElement(Field, {
+    label: "Level",
+    value: form.level || "",
+    onChange: v => setForm(f => ({
+      ...f,
+      level: v
+    })),
+    options: ["Beginner", "Intermediate", "Advanced"],
+    th: th
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      gridColumn: "1/-1"
+    }
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Professor",
+    value: form.professor || "",
+    onChange: v => setForm(f => ({
+      ...f,
+      professor: v
+    })),
+    th: th
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Day",
+    value: form.day || "",
+    onChange: v => setForm(f => ({
+      ...f,
+      day: v
+    })),
+    options: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    th: th
+  }), /*#__PURE__*/React.createElement(Field, {
+    label: "Time",
+    value: form.time || "",
+    onChange: v => setForm(f => ({
+      ...f,
+      time: v
+    })),
+    type: "time",
+    th: th
+  }), /*#__PURE__*/React.createElement(Field, {
+    label: "Duration (min)",
+    value: String(form.duration || 45),
+    onChange: v => setForm(f => ({
+      ...f,
+      duration: Number(v)
+    })),
+    type: "number",
+    th: th
+  }), /*#__PURE__*/React.createElement(Field, {
+    label: "Room",
+    value: form.room || "",
+    onChange: v => setForm(f => ({
+      ...f,
+      room: v
+    })),
+    th: th
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10,
+      justifyContent: "flex-end"
+    }
+  }, /*#__PURE__*/React.createElement(Btn, {
+    onClick: () => setModal(null),
+    outline: true,
+    color: T.text2,
+    th: th
+  }, "Cancel"), /*#__PURE__*/React.createElement(Btn, {
+    onClick: save,
+    disabled: saving,
+    icon: "save",
+    color: "#4ade80",
+    th: th
+  }, saving ? "Saving…" : "Save Class"))));
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// EXPORTS PAGE (admin only)
+// ══════════════════════════════════════════════════════════════════════════════
+const ExportsPage = ({
+  toast,
+  th
+}) => {
+  const T = th || DARK;
+  const [loading, setLoading] = useState({});
+  const exportData = async type => {
+    setLoading(l => ({
+      ...l,
+      [type]: true
+    }));
+    try {
+      if (type === "students") {
+        const rows = await sb.select("students", "?order=name");
+        downloadCSV("students.csv", toCSV(["Name", "DOB", "Instrument", "Level", "Class", "Year", "Parent", "Parent Email", "Parent Phone", "Attendance %", "Grade", "Progress %", "Teacher Notes"], rows.map(r => [r.name, r.dob, r.instrument, r.level, r.class_name, r.academic_year, r.parent_name, r.parent_email, r.parent_phone, r.attendance, r.grade, r.progress, r.teacher_notes])));
+        toast("Students exported!");
+      } else if (type === "payments") {
+        const rows = await sb.select("payments", "?order=year.desc,month");
+        downloadCSV("payments.csv", toCSV(["Student", "Month", "Year", "Amount (€)", "Method", "Notes", "Date"], rows.map(r => [r.student_name, r.month, r.year, r.amount, r.method, r.notes, fd(r.paid_at)])));
+        toast("Payments exported!");
+      } else if (type === "classes") {
+        const rows = await sb.select("classes", "?order=name");
+        downloadCSV("classes.csv", toCSV(["Class Name", "Instrument", "Level", "Professor", "Day", "Time", "Duration", "Room", "Students"], rows.map(r => [r.name, r.instrument, r.level, r.professor, r.day, r.time, r.duration, r.room, r.students])));
+        toast("Classes exported!");
+      } else if (type === "professors") {
+        const rows = await sb.select("professors", "?order=name");
+        downloadCSV("professors.csv", toCSV(["Name", "Instrument", "Email", "Phone", "Hours/Month", "Total Students"], rows.map(r => [r.name, r.instrument, r.email, r.phone, r.hours_this_month, r.total_students])));
+        toast("Faculty exported!");
+      } else if (type === "timesheets") {
+        const rows = await sb.select("timesheets", "?order=date");
+        const profs = await sb.select("professors", "?order=name");
+        const profMap = {};
+        profs.forEach(p => profMap[p.id] = p.name);
+        downloadCSV("timesheets.csv", toCSV(["Professor", "Date", "Clock In", "Clock Out", "Hours"], rows.map(r => [profMap[r.professor_id] || r.professor_id, r.date, r.in_time, r.out_time, r.hours])));
+        toast("Timesheets exported!");
+      } else if (type === "full") {
+        // Download all as separate CSV files
+        const [students, payments, classes, professors, timesheets, profs2] = await Promise.all([sb.select("students", "?order=name"), sb.select("payments", "?order=year.desc,month"), sb.select("classes", "?order=name"), sb.select("professors", "?order=name"), sb.select("timesheets", "?order=date"), sb.select("professors", "?order=name")]);
+        const profMap = {};
+        profs2.forEach(p => profMap[p.id] = p.name);
+        // Download each with a small delay
+        const exports = [{
+          name: "1_students.csv",
+          csv: toCSV(["Name", "DOB", "Instrument", "Level", "Class", "Year", "Parent", "Parent Email", "Attendance %", "Grade", "Progress %"], students.map(r => [r.name, r.dob, r.instrument, r.level, r.class_name, r.academic_year, r.parent_name, r.parent_email, r.attendance, r.grade, r.progress]))
+        }, {
+          name: "2_payments.csv",
+          csv: toCSV(["Student", "Month", "Year", "Amount (€)", "Method", "Notes"], payments.map(r => [r.student_name, r.month, r.year, r.amount, r.method, r.notes]))
+        }, {
+          name: "3_classes.csv",
+          csv: toCSV(["Class Name", "Instrument", "Level", "Professor", "Day", "Time", "Room"], classes.map(r => [r.name, r.instrument, r.level, r.professor, r.day, r.time, r.room]))
+        }, {
+          name: "4_professors.csv",
+          csv: toCSV(["Name", "Instrument", "Email", "Phone", "Hours/Month"], professors.map(r => [r.name, r.instrument, r.email, r.phone, r.hours_this_month]))
+        }, {
+          name: "5_timesheets.csv",
+          csv: toCSV(["Professor", "Date", "In", "Out", "Hours"], timesheets.map(r => [profMap[r.professor_id] || "", r.date, r.in_time, r.out_time, r.hours]))
+        }];
+        exports.forEach(({
+          name,
+          csv
+        }, i) => setTimeout(() => downloadCSV(name, csv), i * 400));
+        toast("Full export started — 5 files downloading!");
+      }
+    } catch (e) {
+      toast(e.message, "error");
+    } finally {
+      setLoading(l => ({
+        ...l,
+        [type]: false
+      }));
+    }
+  };
+  const exportCards = [{
+    key: "students",
+    title: "Students",
+    desc: "All student profiles, attendance, grades, parent info",
+    icon: "users",
+    color: "#C9A84C"
+  }, {
+    key: "payments",
+    title: "Payments",
+    desc: "All payment records with month, amount, method",
+    icon: "credit",
+    color: "#4ade80"
+  }, {
+    key: "classes",
+    title: "Classes",
+    desc: "All classes with schedule, professor, room info",
+    icon: "music",
+    color: "#60a5fa"
+  }, {
+    key: "professors",
+    title: "Faculty",
+    desc: "All professor profiles and hours",
+    icon: "book",
+    color: "#a78bfa"
+  }, {
+    key: "timesheets",
+    title: "Timesheets",
+    desc: "All professor clock-in/out entries",
+    icon: "clock",
+    color: "#f59e0b"
+  }];
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 26,
+      fontFamily: "'Playfair Display',serif",
+      color: T.text,
+      margin: "0 0 4px",
+      fontWeight: 800
+    }
+  }, "Export Data"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: T.text3,
+      fontSize: 13,
+      margin: 0
+    }
+  }, "Download any data as CSV (opens in Excel)")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: `linear-gradient(135deg,${T.gold}18,${T.gold}08)`,
+      border: `1.5px solid ${T.gold}33`,
+      borderRadius: 18,
+      padding: 20,
+      marginBottom: 20,
+      display: "flex",
+      alignItems: "center",
+      gap: 16,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      minWidth: 200
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 18,
+      fontWeight: 800,
+      color: T.text,
+      fontFamily: "'Playfair Display',serif",
+      marginBottom: 4
+    }
+  }, "Full School Export"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.text2,
+      fontSize: 13
+    }
+  }, "Download everything \u2014 students, payments, classes, professors and timesheets as 5 separate CSV files.")), /*#__PURE__*/React.createElement(Btn, {
+    onClick: () => exportData("full"),
+    disabled: loading.full,
+    icon: "download",
+    color: T.gold,
+    style: {
+      flexShrink: 0
+    },
+    th: th
+  }, loading.full ? "Exporting…" : "Export All")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))",
+      gap: 12
+    }
+  }, exportCards.map(card => /*#__PURE__*/React.createElement(Crd, {
+    key: card.key,
+    th: th,
+    ac: card.color,
+    style: {
+      padding: 18
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 44,
+      height: 44,
+      borderRadius: 13,
+      background: `${card.color}18`,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: card.color,
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: card.icon,
+    s: 22
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 16,
+      fontWeight: 700,
+      color: T.text,
+      fontFamily: "'Playfair Display',serif"
+    }
+  }, card.title), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: T.text3,
+      marginTop: 2,
+      lineHeight: 1.4
+    }
+  }, card.desc))), /*#__PURE__*/React.createElement(Btn, {
+    onClick: () => exportData(card.key),
+    disabled: loading[card.key],
+    icon: "download",
+    outline: true,
+    color: card.color,
+    style: {
+      width: "100%",
+      justifyContent: "center"
+    },
+    th: th
+  }, loading[card.key] ? "Exporting…" : `Download ${card.title} CSV`)))));
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PROFESSORS PAGE
 // ══════════════════════════════════════════════════════════════════════════════
 const ProfessorsPage = ({
   role,
-  toast
+  toast,
+  th
 }) => {
+  const T = th || DARK;
   const [profs, setProfs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null);
@@ -2369,17 +3677,9 @@ const ProfessorsPage = ({
   useEffect(() => {
     load();
   }, []);
-  const blank = {
-    name: "",
-    instrument: "",
-    email: "",
-    phone: "",
-    hours_this_month: 0,
-    total_students: 0
-  };
   const save = async () => {
     if (!form.name) {
-      toast("Name is required", "error");
+      toast("Name required", "error");
       return;
     }
     setSaving(true);
@@ -2414,30 +3714,42 @@ const ProfessorsPage = ({
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 18
+      marginBottom: 18,
+      flexWrap: "wrap",
+      gap: 10
     }
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
       fontFamily: "'Playfair Display',serif",
-      color: "#fff",
+      color: T.text,
       margin: "0 0 3px",
       fontWeight: 800
     }
   }, "Faculty"), /*#__PURE__*/React.createElement("p", {
     style: {
-      color: "rgba(255,255,255,0.38)",
+      color: T.text3,
       fontSize: 13,
       margin: 0
     }
   }, profs.length, " professors")), role === "admin" && /*#__PURE__*/React.createElement(Btn, {
     onClick: () => {
-      setForm(blank);
+      setForm({
+        name: "",
+        instrument: "",
+        email: "",
+        phone: "",
+        hours_this_month: 0,
+        total_students: 0
+      });
       setModal("add");
     },
     icon: "plus",
-    color: "#60a5fa"
-  }, "Add Professor")), loading ? /*#__PURE__*/React.createElement(Spinner, null) : /*#__PURE__*/React.createElement("div", {
+    color: "#60a5fa",
+    th: th
+  }, "Add Professor")), loading ? /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  }) : /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))",
@@ -2446,6 +3758,7 @@ const ProfessorsPage = ({
   }, profs.map(p => /*#__PURE__*/React.createElement(Crd, {
     key: p.id,
     ac: "#60a5fa",
+    th: th,
     style: {
       padding: 16
     }
@@ -2468,7 +3781,7 @@ const ProfessorsPage = ({
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontWeight: 700,
-      color: "#fff",
+      color: T.text,
       fontSize: 15,
       fontFamily: "'Playfair Display',serif"
     }
@@ -2481,7 +3794,7 @@ const ProfessorsPage = ({
   }, p.instrument), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
-      color: "rgba(255,255,255,0.3)",
+      color: T.text3,
       marginTop: 3
     }
   }, p.email))), /*#__PURE__*/React.createElement("div", {
@@ -2495,7 +3808,7 @@ const ProfessorsPage = ({
     key: k,
     style: {
       padding: "9px",
-      background: "rgba(255,255,255,0.04)",
+      background: T === LIGHT ? "rgba(0,0,0,0.04)" : "rgba(255,255,255,0.04)",
       borderRadius: 9,
       textAlign: "center"
     }
@@ -2503,13 +3816,13 @@ const ProfessorsPage = ({
     style: {
       fontSize: 17,
       fontWeight: 800,
-      color: "#fff",
+      color: T.text,
       fontFamily: "'Playfair Display',serif"
     }
   }, v), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
-      color: "rgba(255,255,255,0.33)"
+      color: T.text3
     }
   }, k)))), role === "admin" && /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2529,7 +3842,8 @@ const ProfessorsPage = ({
     style: {
       flex: 1,
       justifyContent: "center"
-    }
+    },
+    th: th
   }, "Edit"), /*#__PURE__*/React.createElement(Btn, {
     onClick: () => del(p),
     outline: true,
@@ -2538,11 +3852,13 @@ const ProfessorsPage = ({
     style: {
       flex: 1,
       justifyContent: "center"
-    }
+    },
+    th: th
   }, "Delete"))))), modal && /*#__PURE__*/React.createElement(Modal, {
     title: modal === "add" ? "Add Professor" : `Edit: ${modal.name}`,
     onClose: () => setModal(null),
-    accent: "#60a5fa"
+    accent: "#60a5fa",
+    th: th
   }, /*#__PURE__*/React.createElement(Field, {
     label: "Full Name",
     value: form.name || "",
@@ -2550,14 +3866,16 @@ const ProfessorsPage = ({
       ...f,
       name: v
     })),
-    required: true
+    required: true,
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Instrument",
     value: form.instrument || "",
     onChange: v => setForm(f => ({
       ...f,
       instrument: v
-    }))
+    })),
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Email",
     value: form.email || "",
@@ -2565,14 +3883,16 @@ const ProfessorsPage = ({
       ...f,
       email: v
     })),
-    type: "email"
+    type: "email",
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Phone",
     value: form.phone || "",
     onChange: v => setForm(f => ({
       ...f,
       phone: v
-    }))
+    })),
+    th: th
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
@@ -2586,7 +3906,8 @@ const ProfessorsPage = ({
       ...f,
       hours_this_month: Number(v)
     })),
-    type: "number"
+    type: "number",
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Total Students",
     value: String(form.total_students || 0),
@@ -2594,7 +3915,8 @@ const ProfessorsPage = ({
       ...f,
       total_students: Number(v)
     })),
-    type: "number"
+    type: "number",
+    th: th
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
@@ -2604,310 +3926,26 @@ const ProfessorsPage = ({
   }, /*#__PURE__*/React.createElement(Btn, {
     onClick: () => setModal(null),
     outline: true,
-    color: "#ffffff"
+    color: T.text2,
+    th: th
   }, "Cancel"), /*#__PURE__*/React.createElement(Btn, {
     onClick: save,
     disabled: saving,
     icon: "save",
-    color: "#60a5fa"
+    color: "#60a5fa",
+    th: th
   }, saving ? "Saving…" : "Save"))));
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
-// ADMIN — CLASSES (full CRUD)
-// ══════════════════════════════════════════════════════════════════════════════
-const ClassesPage = ({
-  role,
-  toast
-}) => {
-  const [classes, setClasses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [modal, setModal] = useState(null);
-  const [form, setForm] = useState({});
-  const [saving, setSaving] = useState(false);
-  const load = async () => {
-    setLoading(true);
-    try {
-      setClasses(await sb.select("classes", "?order=name"));
-    } catch (e) {
-      toast(e.message, "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    load();
-  }, []);
-  const blank = {
-    name: "",
-    instrument: "",
-    level: "Beginner",
-    professor: "",
-    students: 0,
-    day: "Monday",
-    time: "09:00",
-    duration: 45,
-    room: ""
-  };
-  const save = async () => {
-    if (!form.name) {
-      toast("Name is required", "error");
-      return;
-    }
-    setSaving(true);
-    try {
-      if (modal === "add") {
-        await sb.insert("classes", form);
-        toast("Class added!");
-      } else {
-        await sb.update("classes", modal.id, form);
-        toast("Updated!");
-      }
-      setModal(null);
-      load();
-    } catch (e) {
-      toast(e.message, "error");
-    } finally {
-      setSaving(false);
-    }
-  };
-  const del = async c => {
-    if (!confirm(`Delete ${c.name}?`)) return;
-    try {
-      await sb.remove("classes", c.id);
-      toast("Deleted");
-      load();
-    } catch (e) {
-      toast(e.message, "error");
-    }
-  };
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: 18
-    }
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
-    style: {
-      fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
-      color: "#fff",
-      margin: "0 0 3px",
-      fontWeight: 800
-    }
-  }, "Classes"), /*#__PURE__*/React.createElement("p", {
-    style: {
-      color: "rgba(255,255,255,0.38)",
-      fontSize: 13,
-      margin: 0
-    }
-  }, classes.length, " active")), role === "admin" && /*#__PURE__*/React.createElement(Btn, {
-    onClick: () => {
-      setForm(blank);
-      setModal("add");
-    },
-    icon: "plus",
-    color: "#4ade80"
-  }, "Add Class")), loading ? /*#__PURE__*/React.createElement(Spinner, null) : /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fill,minmax(270px,1fr))",
-      gap: 12
-    }
-  }, classes.map(c => {
-    const col = lc(c.level);
-    return /*#__PURE__*/React.createElement(Crd, {
-      key: c.id,
-      ac: col,
-      style: {
-        padding: 16
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-        marginBottom: 10
-      }
-    }, /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 28
-      }
-    }, emojiFor(c.instrument)), /*#__PURE__*/React.createElement(Bdg, {
-      text: c.level,
-      color: col
-    })), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 16,
-        fontWeight: 700,
-        color: "#fff",
-        fontFamily: "'Playfair Display',serif",
-        marginBottom: 10
-      }
-    }, c.name), /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: 4,
-        marginBottom: role === "admin" ? 12 : 0
-      }
-    }, [["Professor", (c.professor || "—").replace("Prof. ", "")], ["Day", c.day || "—"], ["Time", c.time || "—"], ["Room", c.room || "—"]].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
-      key: k,
-      style: {
-        fontSize: 12
-      }
-    }, /*#__PURE__*/React.createElement("span", {
-      style: {
-        color: "rgba(255,255,255,0.33)"
-      }
-    }, k, ": "), /*#__PURE__*/React.createElement("span", {
-      style: {
-        color: "rgba(255,255,255,0.78)",
-        fontWeight: 500
-      }
-    }, v)))), role === "admin" && /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        gap: 8
-      }
-    }, /*#__PURE__*/React.createElement(Btn, {
-      onClick: () => {
-        setForm({
-          ...c
-        });
-        setModal(c);
-      },
-      outline: true,
-      color: col,
-      icon: "edit",
-      style: {
-        flex: 1,
-        justifyContent: "center"
-      }
-    }, "Edit"), /*#__PURE__*/React.createElement(Btn, {
-      onClick: () => del(c),
-      outline: true,
-      color: "#f87171",
-      icon: "trash",
-      style: {
-        flex: 1,
-        justifyContent: "center"
-      }
-    }, "Delete")));
-  })), modal && /*#__PURE__*/React.createElement(Modal, {
-    title: modal === "add" ? "Add Class" : `Edit: ${modal.name}`,
-    onClose: () => setModal(null),
-    accent: "#4ade80"
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: "0 12px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      gridColumn: "1/-1"
-    }
-  }, /*#__PURE__*/React.createElement(Field, {
-    label: "Class Name",
-    value: form.name || "",
-    onChange: v => setForm(f => ({
-      ...f,
-      name: v
-    })),
-    required: true
-  })), /*#__PURE__*/React.createElement(Field, {
-    label: "Instrument",
-    value: form.instrument || "",
-    onChange: v => setForm(f => ({
-      ...f,
-      instrument: v
-    })),
-    options: ["Piano", "Guitar", "Violin", "Drums", "Singing", "Viola"]
-  }), /*#__PURE__*/React.createElement(Field, {
-    label: "Level",
-    value: form.level || "",
-    onChange: v => setForm(f => ({
-      ...f,
-      level: v
-    })),
-    options: ["Beginner", "Intermediate", "Advanced"]
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      gridColumn: "1/-1"
-    }
-  }, /*#__PURE__*/React.createElement(Field, {
-    label: "Professor",
-    value: form.professor || "",
-    onChange: v => setForm(f => ({
-      ...f,
-      professor: v
-    }))
-  })), /*#__PURE__*/React.createElement(Field, {
-    label: "Day",
-    value: form.day || "",
-    onChange: v => setForm(f => ({
-      ...f,
-      day: v
-    })),
-    options: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-  }), /*#__PURE__*/React.createElement(Field, {
-    label: "Time",
-    value: form.time || "",
-    onChange: v => setForm(f => ({
-      ...f,
-      time: v
-    })),
-    type: "time"
-  }), /*#__PURE__*/React.createElement(Field, {
-    label: "Duration (min)",
-    value: String(form.duration || 45),
-    onChange: v => setForm(f => ({
-      ...f,
-      duration: Number(v)
-    })),
-    type: "number"
-  }), /*#__PURE__*/React.createElement(Field, {
-    label: "Room",
-    value: form.room || "",
-    onChange: v => setForm(f => ({
-      ...f,
-      room: v
-    }))
-  }), /*#__PURE__*/React.createElement(Field, {
-    label: "Students",
-    value: String(form.students || 0),
-    onChange: v => setForm(f => ({
-      ...f,
-      students: Number(v)
-    })),
-    type: "number"
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 10,
-      justifyContent: "flex-end"
-    }
-  }, /*#__PURE__*/React.createElement(Btn, {
-    onClick: () => setModal(null),
-    outline: true,
-    color: "#ffffff"
-  }, "Cancel"), /*#__PURE__*/React.createElement(Btn, {
-    onClick: save,
-    disabled: saving,
-    icon: "save",
-    color: "#4ade80"
-  }, saving ? "Saving…" : "Save"))));
-};
-
-// ══════════════════════════════════════════════════════════════════════════════
-// ADMIN — EVENTS (full CRUD)
+// EVENTS, WORKHOURS, REPORTS, SCHEDULE, USERS, SETTINGS, DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════════
 const EventsPage = ({
   role,
-  toast
+  toast,
+  th
 }) => {
+  const T = th || DARK;
   const [events, setEvents] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -2932,18 +3970,6 @@ const EventsPage = ({
   }, []);
   const isEvent = tab === "events";
   const table = isEvent ? "events" : "announcements";
-  const blankEv = {
-    title: "",
-    date: "",
-    type: "concert",
-    description: ""
-  };
-  const blankAn = {
-    title: "",
-    date: "",
-    body: "",
-    priority: "normal"
-  };
   const save = async () => {
     if (!form.title) {
       toast("Title required", "error");
@@ -2981,22 +4007,35 @@ const EventsPage = ({
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 18
+      marginBottom: 18,
+      flexWrap: "wrap",
+      gap: 10
     }
   }, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
       fontFamily: "'Playfair Display',serif",
-      color: "#fff",
+      color: T.text,
       margin: 0,
       fontWeight: 800
     }
   }, "Events & Announcements"), role === "admin" && /*#__PURE__*/React.createElement(Btn, {
     onClick: () => {
-      setForm(isEvent ? blankEv : blankAn);
+      setForm(isEvent ? {
+        title: "",
+        date: "",
+        type: "concert",
+        description: ""
+      } : {
+        title: "",
+        date: "",
+        body: "",
+        priority: "normal"
+      });
       setModal("add");
     },
-    icon: "plus"
+    icon: "plus",
+    th: th
   }, "Add")), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
@@ -3013,11 +4052,14 @@ const EventsPage = ({
       cursor: "pointer",
       fontWeight: 600,
       fontSize: 13,
-      background: tab === t ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.05)",
-      color: tab === t ? "#C9A84C" : "rgba(255,255,255,0.4)",
-      boxShadow: tab === t ? "0 0 0 1.5px rgba(201,168,76,0.4)" : "none"
+      background: tab === t ? `${T.gold}22` : `${T === LIGHT ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)"}`,
+      color: tab === t ? T.gold : T.text2,
+      boxShadow: tab === t ? `0 0 0 1.5px ${T.gold}44` : "none"
     }
-  }, t.charAt(0).toUpperCase() + t.slice(1)))), loading ? /*#__PURE__*/React.createElement(Spinner, null) : /*#__PURE__*/React.createElement(Crd, {
+  }, t.charAt(0).toUpperCase() + t.slice(1)))), loading ? /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  }) : /*#__PURE__*/React.createElement(Crd, {
+    th: th,
     style: {
       padding: 16
     }
@@ -3027,7 +4069,7 @@ const EventsPage = ({
       key: item.id,
       style: {
         padding: "13px 0",
-        borderBottom: "1px solid rgba(255,255,255,0.042)"
+        borderBottom: `1px solid ${T.rowBorder}`
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
@@ -3053,19 +4095,19 @@ const EventsPage = ({
     }), /*#__PURE__*/React.createElement("span", {
       style: {
         fontSize: 11,
-        color: "rgba(255,255,255,0.33)"
+        color: T.text3
       }
     }, fd(item.date))), /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 15,
         fontWeight: 700,
-        color: "#fff",
+        color: T.text,
         marginBottom: 3
       }
     }, item.title), /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 13,
-        color: "rgba(255,255,255,0.45)",
+        color: T.text2,
         lineHeight: 1.5
       }
     }, item.description || item.body)), role === "admin" && /*#__PURE__*/React.createElement("div", {
@@ -3118,11 +4160,12 @@ const EventsPage = ({
     style: {
       padding: 20,
       textAlign: "center",
-      color: "rgba(255,255,255,0.3)"
+      color: T.text3
     }
   }, "None yet.")), modal && /*#__PURE__*/React.createElement(Modal, {
-    title: modal === "add" ? `Add ${isEvent ? "Event" : "Announcement"}` : `Edit`,
-    onClose: () => setModal(null)
+    title: modal === "add" ? `Add ${isEvent ? "Event" : "Announcement"}` : "Edit",
+    onClose: () => setModal(null),
+    th: th
   }, /*#__PURE__*/React.createElement(Field, {
     label: "Title",
     value: form.title || "",
@@ -3130,7 +4173,8 @@ const EventsPage = ({
       ...f,
       title: v
     })),
-    required: true
+    required: true,
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Date",
     value: form.date || "",
@@ -3138,7 +4182,8 @@ const EventsPage = ({
       ...f,
       date: v
     })),
-    type: "date"
+    type: "date",
+    th: th
   }), isEvent ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Field, {
     label: "Type",
     value: form.type || "",
@@ -3146,7 +4191,8 @@ const EventsPage = ({
       ...f,
       type: v
     })),
-    options: ["concert", "meeting", "masterclass", "workshop", "other"]
+    options: ["concert", "meeting", "masterclass", "workshop", "other"],
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Description",
     value: form.description || "",
@@ -3154,7 +4200,8 @@ const EventsPage = ({
       ...f,
       description: v
     })),
-    type: "textarea"
+    type: "textarea",
+    th: th
   })) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Field, {
     label: "Priority",
     value: form.priority || "",
@@ -3162,7 +4209,8 @@ const EventsPage = ({
       ...f,
       priority: v
     })),
-    options: ["normal", "high"]
+    options: ["normal", "high"],
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Body",
     value: form.body || "",
@@ -3170,7 +4218,8 @@ const EventsPage = ({
       ...f,
       body: v
     })),
-    type: "textarea"
+    type: "textarea",
+    th: th
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
@@ -3180,21 +4229,21 @@ const EventsPage = ({
   }, /*#__PURE__*/React.createElement(Btn, {
     onClick: () => setModal(null),
     outline: true,
-    color: "#ffffff"
+    color: T.text2,
+    th: th
   }, "Cancel"), /*#__PURE__*/React.createElement(Btn, {
     onClick: save,
     disabled: saving,
-    icon: "save"
+    icon: "save",
+    th: th
   }, saving ? "Saving…" : "Save"))));
 };
-
-// ══════════════════════════════════════════════════════════════════════════════
-// WORKING HOURS
-// ══════════════════════════════════════════════════════════════════════════════
 const WorkHoursPage = ({
   role,
-  toast
+  toast,
+  th
 }) => {
+  const T = th || DARK;
   const [profs, setProfs] = useState([]);
   const [entries, setEntries] = useState([]);
   const [activeId, setActiveId] = useState(null);
@@ -3239,8 +4288,8 @@ const WorkHoursPage = ({
         out_time: "",
         hours: 0
       });
-      const updated = await sb.select("timesheets", `?professor_id=eq.${activeId}&order=date`);
-      setEntries(updated);
+      const u = await sb.select("timesheets", `?professor_id=eq.${activeId}&order=date`);
+      setEntries(u);
     } catch (e) {
       toast(e.message, "error");
     } finally {
@@ -3261,20 +4310,25 @@ const WorkHoursPage = ({
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 18
+      marginBottom: 18,
+      flexWrap: "wrap",
+      gap: 10
     }
   }, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
       fontFamily: "'Playfair Display',serif",
-      color: "#fff",
+      color: T.text,
       margin: 0,
       fontWeight: 800
     }
   }, "Working Hours"), role === "admin" && /*#__PURE__*/React.createElement(Btn, {
     onClick: () => setModal(true),
-    icon: "plus"
-  }, "Add Entry")), loading ? /*#__PURE__*/React.createElement(Spinner, null) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    icon: "plus",
+    th: th
+  }, "Add Entry")), loading ? /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  }) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 7,
@@ -3295,10 +4349,9 @@ const WorkHoursPage = ({
       fontWeight: 500,
       whiteSpace: "nowrap",
       flexShrink: 0,
-      background: activeId === p.id ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.05)",
-      color: activeId === p.id ? "#C9A84C" : "rgba(255,255,255,0.42)",
-      boxShadow: activeId === p.id ? "0 0 0 1.5px rgba(201,168,76,0.48)" : "none",
-      WebkitTapHighlightColor: "transparent"
+      background: activeId === p.id ? `${T.gold}22` : T === LIGHT ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)",
+      color: activeId === p.id ? T.gold : T.text2,
+      boxShadow: activeId === p.id ? `0 0 0 1.5px ${T.gold}44` : "none"
     }
   }, p.name?.replace("Prof. ", "")))), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -3311,26 +4364,31 @@ const WorkHoursPage = ({
     icon: "clock",
     label: "Total",
     value: `${total}h`,
-    color: "#C9A84C"
+    color: "#C9A84C",
+    th: th
   }), /*#__PURE__*/React.createElement(Stat, {
     icon: "calendar",
     label: "Sessions",
     value: entries.length,
-    color: "#60a5fa"
+    color: "#60a5fa",
+    th: th
   }), /*#__PURE__*/React.createElement(Stat, {
     icon: "users",
     label: "Students",
     value: prof?.total_students || 0,
-    color: "#4ade80"
-  })), /*#__PURE__*/React.createElement(Crd, null, /*#__PURE__*/React.createElement("div", {
+    color: "#4ade80",
+    th: th
+  })), /*#__PURE__*/React.createElement(Crd, {
+    th: th
+  }, /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "13px 15px",
-      borderBottom: "1px solid rgba(255,255,255,0.07)"
+      borderBottom: `1px solid ${T.border}`
     }
   }, /*#__PURE__*/React.createElement("span", {
     style: {
       fontFamily: "'Playfair Display',serif",
-      color: "#C9A84C",
+      color: T.gold,
       fontSize: 15,
       fontWeight: 700
     }
@@ -3346,14 +4404,14 @@ const WorkHoursPage = ({
     }
   }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", {
     style: {
-      borderBottom: "1px solid rgba(255,255,255,0.06)"
+      borderBottom: `1px solid ${T.border}`
     }
   }, ["Date", "In", "Out", "Hours", ""].map(h => /*#__PURE__*/React.createElement("th", {
     key: h,
     style: {
       padding: "10px 14px",
       textAlign: "left",
-      color: "rgba(255,255,255,0.33)",
+      color: T.text3,
       fontSize: 10,
       textTransform: "uppercase",
       letterSpacing: "0.07em"
@@ -3363,17 +4421,17 @@ const WorkHoursPage = ({
     style: {
       padding: 20,
       textAlign: "center",
-      color: "rgba(255,255,255,0.3)"
+      color: T.text3
     }
   }, "No entries yet.")), entries.map(e => /*#__PURE__*/React.createElement("tr", {
     key: e.id,
     style: {
-      borderBottom: "1px solid rgba(255,255,255,0.03)"
+      borderBottom: `1px solid ${T.rowBorder}`
     }
   }, /*#__PURE__*/React.createElement("td", {
     style: {
       padding: "10px 14px",
-      color: "rgba(255,255,255,0.72)"
+      color: T.text
     }
   }, fd(e.date, {
     weekday: "short",
@@ -3421,14 +4479,14 @@ const WorkHoursPage = ({
     s: 11
   })))))), entries.length > 0 && /*#__PURE__*/React.createElement("tfoot", null, /*#__PURE__*/React.createElement("tr", {
     style: {
-      borderTop: "2px solid rgba(201,168,76,0.22)",
-      background: "rgba(201,168,76,0.04)"
+      borderTop: `2px solid ${T.gold}33`,
+      background: `${T.gold}08`
     }
   }, /*#__PURE__*/React.createElement("td", {
     colSpan: 3,
     style: {
       padding: "11px 14px",
-      color: "#C9A84C",
+      color: T.gold,
       fontWeight: 700,
       fontSize: 11,
       textTransform: "uppercase",
@@ -3442,8 +4500,9 @@ const WorkHoursPage = ({
     text: `${total}h`,
     color: "#C9A84C"
   })), /*#__PURE__*/React.createElement("td", null))))))), modal && /*#__PURE__*/React.createElement(Modal, {
-    title: "Add Timesheet Entry",
-    onClose: () => setModal(false)
+    title: "Add Entry",
+    onClose: () => setModal(false),
+    th: th
   }, /*#__PURE__*/React.createElement(Field, {
     label: "Date",
     value: form.date,
@@ -3452,7 +4511,8 @@ const WorkHoursPage = ({
       date: v
     })),
     type: "date",
-    required: true
+    required: true,
+    th: th
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
@@ -3466,7 +4526,8 @@ const WorkHoursPage = ({
       ...f,
       in_time: v
     })),
-    type: "time"
+    type: "time",
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Clock Out",
     value: form.out_time,
@@ -3474,7 +4535,8 @@ const WorkHoursPage = ({
       ...f,
       out_time: v
     })),
-    type: "time"
+    type: "time",
+    th: th
   })), /*#__PURE__*/React.createElement(Field, {
     label: "Hours",
     value: String(form.hours),
@@ -3482,7 +4544,8 @@ const WorkHoursPage = ({
       ...f,
       hours: Number(v)
     })),
-    type: "number"
+    type: "number",
+    th: th
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
@@ -3492,20 +4555,242 @@ const WorkHoursPage = ({
   }, /*#__PURE__*/React.createElement(Btn, {
     onClick: () => setModal(false),
     outline: true,
-    color: "#ffffff"
+    color: T.text2,
+    th: th
   }, "Cancel"), /*#__PURE__*/React.createElement(Btn, {
     onClick: addEntry,
     disabled: saving,
-    icon: "save"
-  }, saving ? "Saving…" : "Add Entry"))));
+    icon: "save",
+    th: th
+  }, saving ? "Saving…" : "Add"))));
 };
-
-// ══════════════════════════════════════════════════════════════════════════════
-// USER MANAGEMENT (admin only)
-// ══════════════════════════════════════════════════════════════════════════════
-const UsersPage = ({
-  toast
+const ReportsPage = ({
+  toast,
+  th
 }) => {
+  const T = th || DARK;
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    sb.select("students", "?order=name").then(setStudents).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
+  }, []);
+  const avgAtt = students.length ? Math.round(students.reduce((s, x) => s + (x.attendance || 0), 0) / students.length) : 0;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 26,
+      fontFamily: "'Playfair Display',serif",
+      color: T.text,
+      margin: "0 0 18px",
+      fontWeight: 800
+    }
+  }, "Reports"), loading ? /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  }) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: 9,
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement(Stat, {
+    icon: "users",
+    label: "Students",
+    value: students.length,
+    color: "#C9A84C",
+    th: th
+  }), /*#__PURE__*/React.createElement(Stat, {
+    icon: "check",
+    label: "Avg Attend.",
+    value: `${avgAtt}%`,
+    color: "#4ade80",
+    th: th
+  }), /*#__PURE__*/React.createElement(Stat, {
+    icon: "award",
+    label: "Advanced",
+    value: students.filter(s => s.level === "Advanced").length,
+    color: "#a78bfa",
+    th: th
+  }), /*#__PURE__*/React.createElement(Stat, {
+    icon: "star",
+    label: "Avg Progress",
+    value: `${students.length ? Math.round(students.reduce((s, x) => s + (x.progress || 0), 0) / students.length) : 0}%`,
+    color: "#60a5fa",
+    th: th
+  })), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: 16
+    }
+  }, /*#__PURE__*/React.createElement(SH, {
+    title: "Student Progress",
+    color: T.gold,
+    th: th
+  }), students.length === 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.text3,
+      fontSize: 13,
+      textAlign: "center",
+      padding: "16px 0"
+    }
+  }, "No students yet."), students.map(s => /*#__PURE__*/React.createElement("div", {
+    key: s.id,
+    style: {
+      padding: "11px 0",
+      borderBottom: `1px solid ${T.rowBorder}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 7
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 9
+    }
+  }, /*#__PURE__*/React.createElement(Av, {
+    name: s.name,
+    color: "#C9A84C",
+    size: 32
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 500,
+      color: T.text
+    }
+  }, s.name), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: T.text3
+    }
+  }, s.class_name || "—"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 5
+    }
+  }, /*#__PURE__*/React.createElement(Bdg, {
+    text: s.grade || "—",
+    color: "#C9A84C"
+  }), /*#__PURE__*/React.createElement(Bdg, {
+    text: `${s.attendance || 0}%`,
+    color: (s.attendance || 0) >= 85 ? "#4ade80" : "#fbbf24"
+  }))), /*#__PURE__*/React.createElement(Bar, {
+    value: s.progress || 0,
+    color: "#C9A84C",
+    h: 5,
+    th: th
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: T.text3,
+      marginTop: 4
+    }
+  }, "Progress: ", s.progress || 0, "%"))))));
+};
+const SchedulePage = ({
+  toast,
+  th
+}) => {
+  const T = th || DARK;
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    sb.select("classes", "?order=day,time").then(setClasses).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
+  }, []);
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 26,
+      fontFamily: "'Playfair Display',serif",
+      color: T.text,
+      margin: "0 0 18px",
+      fontWeight: 800
+    }
+  }, "Weekly Schedule"), loading ? /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  }) : days.map(day => {
+    const dc = classes.filter(c => c.day === day);
+    if (!dc.length) return null;
+    return /*#__PURE__*/React.createElement("div", {
+      key: day,
+      style: {
+        marginBottom: 16
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: T.text3,
+        textTransform: "uppercase",
+        letterSpacing: "0.08em",
+        marginBottom: 8,
+        fontWeight: 700
+      }
+    }, day), dc.map(c => {
+      const col = lc(c.level);
+      return /*#__PURE__*/React.createElement(Crd, {
+        key: c.id,
+        ac: col,
+        th: th,
+        style: {
+          padding: 14,
+          marginBottom: 8,
+          display: "flex",
+          alignItems: "center",
+          gap: 12
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          width: 48,
+          textAlign: "center",
+          flexShrink: 0
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 15,
+          fontWeight: 800,
+          color: col
+        }
+      }, c.time), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 10,
+          color: T.text3
+        }
+      }, c.duration, "m")), /*#__PURE__*/React.createElement("div", {
+        style: {
+          flex: 1,
+          minWidth: 0
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 14,
+          fontWeight: 700,
+          color: T.text,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap"
+        }
+      }, c.name), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 12,
+          color: T.text2,
+          marginTop: 2
+        }
+      }, c.room, " \xB7 ", (c.professor || "").replace("Prof. ", ""))), /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 22
+        }
+      }, emojiFor(c.instrument)));
+    }));
+  }));
+};
+const UsersPage = ({
+  toast,
+  th
+}) => {
+  const T = th || DARK;
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
@@ -3536,8 +4821,6 @@ const UsersPage = ({
     }
     setSaving(true);
     try {
-      // Create auth user via admin endpoint — note: anon key can only invite, not create
-      // We'll use Supabase signup instead
       const r = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
         method: "POST",
         headers: {
@@ -3551,14 +4834,13 @@ const UsersPage = ({
       });
       const d = await r.json();
       if (d.error) throw new Error(d.error.message || d.msg);
-      // Insert profile
       await sb.insert("profiles", {
         user_id: d.user?.id || d.id,
         email: form.email,
         full_name: form.full_name,
         role: form.role
       });
-      toast("User created! They can now log in.");
+      toast("User created!");
       setModal(false);
       setForm({
         full_name: "",
@@ -3583,55 +4865,48 @@ const UsersPage = ({
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 18
+      marginBottom: 18,
+      flexWrap: "wrap",
+      gap: 10
     }
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
       fontFamily: "'Playfair Display',serif",
-      color: "#fff",
+      color: T.text,
       margin: "0 0 3px",
       fontWeight: 800
     }
   }, "Manage Users"), /*#__PURE__*/React.createElement("p", {
     style: {
-      color: "rgba(255,255,255,0.38)",
+      color: T.text3,
       fontSize: 13,
       margin: 0
     }
   }, "Create accounts for professors and parents")), /*#__PURE__*/React.createElement(Btn, {
     onClick: () => setModal(true),
     icon: "plus",
-    color: "#a78bfa"
+    color: "#a78bfa",
+    th: th
   }, "New User")), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "12px 16px",
-      background: "rgba(201,168,76,0.07)",
-      border: "1px solid rgba(201,168,76,0.2)",
+      background: `${T.gold}10`,
+      border: `1px solid ${T.gold}28`,
       borderRadius: 12,
       marginBottom: 16
     }
-  }, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("p", {
     style: {
-      display: "flex",
-      gap: 8,
-      alignItems: "flex-start"
-    }
-  }, /*#__PURE__*/React.createElement(Ic, {
-    n: "info",
-    s: 16,
-    style: {
-      color: "#C9A84C",
-      flexShrink: 0
-    }
-  }), /*#__PURE__*/React.createElement("p", {
-    style: {
-      color: "rgba(255,255,255,0.65)",
+      color: T.text2,
       fontSize: 13,
       margin: 0,
       lineHeight: 1.6
     }
-  }, "Create an account for each professor and parent. They'll log in with their email and password. Note: Supabase may require email confirmation \u2014 you can disable this in Supabase \u2192 Auth \u2192 Settings \u2192 \"Confirm email\"."))), loading ? /*#__PURE__*/React.createElement(Spinner, null) : /*#__PURE__*/React.createElement(Crd, {
+  }, "\uD83D\uDCA1 Create an account for each professor and parent. They log in with email + password. Tip: Disable \"Confirm email\" in Supabase \u2192 Auth \u2192 Settings so users can log in immediately.")), loading ? /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  }) : /*#__PURE__*/React.createElement(Crd, {
+    th: th,
     style: {
       padding: "0 14px"
     }
@@ -3639,10 +4914,11 @@ const UsersPage = ({
     style: {
       padding: 24,
       textAlign: "center",
-      color: "rgba(255,255,255,0.3)"
+      color: T.text3
     }
-  }, "No users yet. Create the first one!"), users.map(u => /*#__PURE__*/React.createElement(Row, {
+  }, "No users yet."), users.map(u => /*#__PURE__*/React.createElement(Row, {
     key: u.id,
+    th: th,
     left: /*#__PURE__*/React.createElement(Av, {
       name: u.full_name,
       color: roleColor[u.role] || "#C9A84C",
@@ -3657,7 +4933,8 @@ const UsersPage = ({
   }))), modal && /*#__PURE__*/React.createElement(Modal, {
     title: "Create New User",
     onClose: () => setModal(false),
-    accent: "#a78bfa"
+    accent: "#a78bfa",
+    th: th
   }, /*#__PURE__*/React.createElement(Field, {
     label: "Full Name",
     value: form.full_name,
@@ -3665,7 +4942,8 @@ const UsersPage = ({
       ...f,
       full_name: v
     })),
-    required: true
+    required: true,
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Email",
     value: form.email,
@@ -3674,7 +4952,8 @@ const UsersPage = ({
       email: v
     })),
     type: "email",
-    required: true
+    required: true,
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Password",
     value: form.password,
@@ -3683,7 +4962,8 @@ const UsersPage = ({
       password: v
     })),
     type: "password",
-    required: true
+    required: true,
+    th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Role",
     value: form.role,
@@ -3691,7 +4971,8 @@ const UsersPage = ({
       ...f,
       role: v
     })),
-    options: ["admin", "professor", "parent"]
+    options: ["admin", "professor", "parent"],
+    th: th
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
@@ -3701,50 +4982,54 @@ const UsersPage = ({
   }, /*#__PURE__*/React.createElement(Btn, {
     onClick: () => setModal(false),
     outline: true,
-    color: "#ffffff"
+    color: T.text2,
+    th: th
   }, "Cancel"), /*#__PURE__*/React.createElement(Btn, {
     onClick: createUser,
     disabled: saving,
     icon: "user",
-    color: "#a78bfa"
+    color: "#a78bfa",
+    th: th
   }, saving ? "Creating…" : "Create User"))));
 };
-
-// ══════════════════════════════════════════════════════════════════════════════
-// DASHBOARD (role-aware)
-// ══════════════════════════════════════════════════════════════════════════════
 const Dashboard = ({
   session,
-  toast
+  toast,
+  th
 }) => {
+  const T = th || DARK;
   const [stats, setStats] = useState({
     students: 0,
     professors: 0,
     classes: 0,
-    events: 0
+    payments: 0
   });
   const [recentStudents, setRecentStudents] = useState([]);
   const [recentEvents, setRecentEvents] = useState([]);
+  const [unpaidCount, setUnpaidCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const role = session.profile.role;
   const name = session.profile.full_name;
   useEffect(() => {
-    Promise.all([sb.select("students", "?order=name&limit=5"), sb.select("professors", "?limit=1").then(r => r.length), sb.select("classes", "?limit=1").then(r => r.length), sb.select("events", "?order=date&limit=4")]).then(([students, profCount, classCount, events]) => {
+    Promise.all([sb.select("students", "?order=name&limit=5"), sb.select("professors", "?select=id"), sb.select("classes", "?select=id"), sb.select("events", "?order=date&limit=4"), sb.select("payments", `?month=eq.${MONTHS[new Date().getMonth()]}&year=eq.${new Date().getFullYear()}`)]).then(([students, profs, classes, events, payments]) => {
       setStats({
         students: students.length,
-        professors: profCount,
-        classes: classCount,
-        events: events.length
+        professors: profs.length,
+        classes: classes.length,
+        payments: payments.length
       });
       setRecentStudents(students);
       setRecentEvents(events);
+      setUnpaidCount(Math.max(0, students.length - payments.length));
       setLoading(false);
     }).catch(e => {
       toast(e.message, "error");
       setLoading(false);
     });
   }, []);
-  if (loading) return /*#__PURE__*/React.createElement(Spinner, null);
+  if (loading) return /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  });
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 20
@@ -3753,13 +5038,13 @@ const Dashboard = ({
     style: {
       fontSize: 26,
       fontFamily: "'Playfair Display',serif",
-      color: "#fff",
+      color: T.text,
       margin: "0 0 4px",
       fontWeight: 800
     }
   }, "Welcome, ", name?.split(" ")[0], " \uD83D\uDC4B"), /*#__PURE__*/React.createElement("p", {
     style: {
-      color: "rgba(255,255,255,0.38)",
+      color: T.text3,
       fontSize: 13,
       margin: 0
     }
@@ -3779,39 +5064,47 @@ const Dashboard = ({
     icon: "users",
     label: "Students",
     value: stats.students,
-    color: "#C9A84C"
+    color: "#C9A84C",
+    th: th
   }), /*#__PURE__*/React.createElement(Stat, {
     icon: "book",
     label: "Faculty",
     value: stats.professors,
-    color: "#60a5fa"
+    color: "#60a5fa",
+    th: th
   }), /*#__PURE__*/React.createElement(Stat, {
     icon: "music",
     label: "Classes",
     value: stats.classes,
-    color: "#4ade80"
+    color: "#4ade80",
+    th: th
   }), /*#__PURE__*/React.createElement(Stat, {
-    icon: "bell",
-    label: "Events",
-    value: stats.events,
-    color: "#a78bfa"
+    icon: "credit",
+    label: "Paid This Month",
+    value: stats.payments,
+    sub: unpaidCount > 0 ? `${unpaidCount} unpaid` : "",
+    color: unpaidCount > 0 ? "#f87171" : "#4ade80",
+    th: th
   })), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
     style: {
       padding: 16,
       marginBottom: 12
     }
   }, /*#__PURE__*/React.createElement(SH, {
     title: "Recent Students",
-    color: "#C9A84C"
+    color: T.gold,
+    th: th
   }), recentStudents.length === 0 && /*#__PURE__*/React.createElement("div", {
     style: {
-      color: "rgba(255,255,255,0.3)",
+      color: T.text3,
       fontSize: 13,
       textAlign: "center",
       padding: "16px 0"
     }
-  }, "No students yet \u2014 add some in Students."), recentStudents.map(s => /*#__PURE__*/React.createElement(Row, {
+  }, "No students yet."), recentStudents.map(s => /*#__PURE__*/React.createElement(Row, {
     key: s.id,
+    th: th,
     left: /*#__PURE__*/React.createElement(Av, {
       name: s.name,
       color: "#C9A84C",
@@ -3824,15 +5117,17 @@ const Dashboard = ({
       color: "#C9A84C"
     })
   }))), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
     style: {
       padding: 16
     }
   }, /*#__PURE__*/React.createElement(SH, {
     title: "Upcoming Events",
-    color: "#a78bfa"
+    color: "#a78bfa",
+    th: th
   }), recentEvents.length === 0 && /*#__PURE__*/React.createElement("div", {
     style: {
-      color: "rgba(255,255,255,0.3)",
+      color: T.text3,
       fontSize: 13,
       textAlign: "center",
       padding: "16px 0"
@@ -3841,6 +5136,7 @@ const Dashboard = ({
     const col = ev.type === "concert" ? "#f59e0b" : ev.type === "meeting" ? "#60a5fa" : "#a78bfa";
     return /*#__PURE__*/React.createElement(Row, {
       key: ev.id,
+      th: th,
       left: /*#__PURE__*/React.createElement("div", {
         style: {
           width: 40,
@@ -3857,7 +5153,7 @@ const Dashboard = ({
       }, ev.date ? new Date(ev.date).getDate() : "?"), /*#__PURE__*/React.createElement("div", {
         style: {
           fontSize: 10,
-          color: "rgba(255,255,255,0.33)",
+          color: T.text3,
           textTransform: "uppercase"
         }
       }, ev.date ? new Date(ev.date).toLocaleDateString("en-US", {
@@ -3872,227 +5168,11 @@ const Dashboard = ({
     });
   })));
 };
-
-// ══════════════════════════════════════════════════════════════════════════════
-// SCHEDULE PAGE
-// ══════════════════════════════════════════════════════════════════════════════
-const SchedulePage = ({
-  toast
-}) => {
-  const [classes, setClasses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    sb.select("classes", "?order=day,time").then(setClasses).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
-  }, []);
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
-    style: {
-      fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
-      color: "#fff",
-      margin: "0 0 18px",
-      fontWeight: 800
-    }
-  }, "Weekly Schedule"), loading ? /*#__PURE__*/React.createElement(Spinner, null) : days.map(day => {
-    const dc = classes.filter(c => c.day === day);
-    if (!dc.length) return null;
-    return /*#__PURE__*/React.createElement("div", {
-      key: day,
-      style: {
-        marginBottom: 16
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        color: "rgba(255,255,255,0.38)",
-        textTransform: "uppercase",
-        letterSpacing: "0.08em",
-        marginBottom: 8,
-        fontWeight: 700
-      }
-    }, day), dc.map(c => {
-      const col = lc(c.level);
-      return /*#__PURE__*/React.createElement(Crd, {
-        key: c.id,
-        ac: col,
-        style: {
-          padding: 14,
-          marginBottom: 8,
-          display: "flex",
-          alignItems: "center",
-          gap: 12
-        }
-      }, /*#__PURE__*/React.createElement("div", {
-        style: {
-          width: 48,
-          textAlign: "center",
-          flexShrink: 0
-        }
-      }, /*#__PURE__*/React.createElement("div", {
-        style: {
-          fontSize: 15,
-          fontWeight: 800,
-          color: col
-        }
-      }, c.time), /*#__PURE__*/React.createElement("div", {
-        style: {
-          fontSize: 10,
-          color: "rgba(255,255,255,0.33)"
-        }
-      }, c.duration, "m")), /*#__PURE__*/React.createElement("div", {
-        style: {
-          flex: 1,
-          minWidth: 0
-        }
-      }, /*#__PURE__*/React.createElement("div", {
-        style: {
-          fontSize: 14,
-          fontWeight: 700,
-          color: "#fff",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap"
-        }
-      }, c.name), /*#__PURE__*/React.createElement("div", {
-        style: {
-          fontSize: 12,
-          color: "rgba(255,255,255,0.4)",
-          marginTop: 2
-        }
-      }, c.room, " \xB7 ", (c.professor || "").replace("Prof. ", ""))), /*#__PURE__*/React.createElement("span", {
-        style: {
-          fontSize: 22
-        }
-      }, emojiFor(c.instrument)));
-    }));
-  }));
-};
-
-// ══════════════════════════════════════════════════════════════════════════════
-// REPORTS
-// ══════════════════════════════════════════════════════════════════════════════
-const ReportsPage = ({
-  toast
-}) => {
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    sb.select("students", "?order=name").then(setStudents).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
-  }, []);
-  const avgAtt = students.length ? Math.round(students.reduce((s, x) => s + (x.attendance || 0), 0) / students.length) : 0;
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
-    style: {
-      fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
-      color: "#fff",
-      margin: "0 0 18px",
-      fontWeight: 800
-    }
-  }, "Reports"), loading ? /*#__PURE__*/React.createElement(Spinner, null) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: 9,
-      marginBottom: 14
-    }
-  }, /*#__PURE__*/React.createElement(Stat, {
-    icon: "users",
-    label: "Students",
-    value: students.length,
-    color: "#C9A84C"
-  }), /*#__PURE__*/React.createElement(Stat, {
-    icon: "check",
-    label: "Avg Attend.",
-    value: `${avgAtt}%`,
-    color: "#4ade80"
-  }), /*#__PURE__*/React.createElement(Stat, {
-    icon: "award",
-    label: "Advanced",
-    value: students.filter(s => s.level === "Advanced").length,
-    color: "#a78bfa"
-  }), /*#__PURE__*/React.createElement(Stat, {
-    icon: "star",
-    label: "Avg Progress",
-    value: `${students.length ? Math.round(students.reduce((s, x) => s + (x.progress || 0), 0) / students.length) : 0}%`,
-    color: "#60a5fa"
-  })), /*#__PURE__*/React.createElement(Crd, {
-    style: {
-      padding: 16
-    }
-  }, /*#__PURE__*/React.createElement(SH, {
-    title: "Student Progress",
-    color: "#C9A84C"
-  }), students.length === 0 && /*#__PURE__*/React.createElement("div", {
-    style: {
-      color: "rgba(255,255,255,0.3)",
-      fontSize: 13,
-      textAlign: "center",
-      padding: "16px 0"
-    }
-  }, "No students yet."), students.map(s => /*#__PURE__*/React.createElement("div", {
-    key: s.id,
-    style: {
-      padding: "11px 0",
-      borderBottom: "1px solid rgba(255,255,255,0.042)"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: 7
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      alignItems: "center",
-      gap: 9
-    }
-  }, /*#__PURE__*/React.createElement(Av, {
-    name: s.name,
-    color: "#C9A84C",
-    size: 32
-  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 13,
-      fontWeight: 500,
-      color: "#fff"
-    }
-  }, s.name), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: "rgba(255,255,255,0.33)"
-    }
-  }, s.class_name || "—"))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 5
-    }
-  }, /*#__PURE__*/React.createElement(Bdg, {
-    text: s.grade || "—",
-    color: "#C9A84C"
-  }), /*#__PURE__*/React.createElement(Bdg, {
-    text: `${s.attendance || 0}%`,
-    color: (s.attendance || 0) >= 85 ? "#4ade80" : "#fbbf24"
-  }))), /*#__PURE__*/React.createElement(Bar, {
-    value: s.progress || 0,
-    color: "#C9A84C",
-    h: 5
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: "rgba(255,255,255,0.28)",
-      marginTop: 4
-    }
-  }, "Progress: ", s.progress || 0, "%"))))));
-};
-
-// ══════════════════════════════════════════════════════════════════════════════
-// SETTINGS
-// ══════════════════════════════════════════════════════════════════════════════
 const SettingsPage = ({
-  session
+  session,
+  th
 }) => {
+  const T = th || DARK;
   const items = [{
     title: "Academic Year",
     desc: "Manage years & semesters",
@@ -4118,14 +5198,14 @@ const SettingsPage = ({
     style: {
       fontSize: 26,
       fontFamily: "'Playfair Display',serif",
-      color: "#fff",
-      margin: "0 0 8px",
+      color: T.text,
+      margin: "0 0 14px",
       fontWeight: 800
     }
   }, "Settings"), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "12px 16px",
-      background: "rgba(96,165,250,0.07)",
+      background: "rgba(96,165,250,0.08)",
       border: "1px solid rgba(96,165,250,0.2)",
       borderRadius: 12,
       marginBottom: 16
@@ -4133,22 +5213,24 @@ const SettingsPage = ({
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
-      color: "rgba(255,255,255,0.6)",
+      color: T.text2,
       lineHeight: 1.6
     }
   }, "Logged in as ", /*#__PURE__*/React.createElement("strong", {
     style: {
-      color: "#fff"
+      color: T.text
     }
   }, session.profile.full_name), " \xB7 ", /*#__PURE__*/React.createElement(Bdg, {
     text: session.profile.role,
     color: rc(session.profile.role)
   }))), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
     style: {
       padding: "0 14px"
     }
   }, items.map((s, i) => /*#__PURE__*/React.createElement(Row, {
     key: i,
+    th: th,
     left: /*#__PURE__*/React.createElement("div", {
       style: {
         width: 40,
@@ -4168,7 +5250,7 @@ const SettingsPage = ({
     sub: s.desc,
     right: /*#__PURE__*/React.createElement("div", {
       style: {
-        color: "rgba(255,255,255,0.2)"
+        color: T.text3
       }
     }, /*#__PURE__*/React.createElement(Ic, {
       n: "chevr",
@@ -4179,17 +5261,19 @@ const SettingsPage = ({
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
-// PAGE TITLES & APP ROOT
+// APP ROOT
 // ══════════════════════════════════════════════════════════════════════════════
 const pageTitles = {
   dashboard: "Dashboard",
   students: "Students",
   professors: "Faculty",
   classes: "Classes",
+  payments: "Payments",
   schedule: "Schedule",
   workhours: "Working Hours",
   reports: "Reports",
   events: "Events",
+  exports: "Export Data",
   users: "Manage Users",
   settings: "Settings",
   myclasses: "My Classes",
@@ -4205,18 +5289,20 @@ function App() {
   const [page, setPage] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  const [toast, setToast] = useState(null);
+  const [toast, setToastState] = useState(null);
+  const [darkMode, setDarkMode] = useState(true);
   const {
     isMobile,
     isTablet
   } = useMedia();
   const mob = isMobile || isTablet;
+  const th = darkMode ? DARK : LIGHT;
   const showToast = (msg, type = "success") => {
-    setToast({
+    setToastState({
       msg,
       type
     });
-    setTimeout(() => setToast(null), 3000);
+    setTimeout(() => setToastState(null), 3200);
   };
   const handleLogin = s => {
     setSession(s);
@@ -4238,50 +5324,50 @@ function App() {
     }
   };
   if (!session) return /*#__PURE__*/React.createElement(Login, {
-    onLogin: handleLogin
+    onLogin: handleLogin,
+    th: th
   });
   const role = session.profile.role;
-  const commonProps = {
+  const cp = {
     role,
     toast: showToast,
-    session
+    session,
+    th
   };
   const renderPage = () => {
-    // All roles
-    if (page === "dashboard") return /*#__PURE__*/React.createElement(Dashboard, commonProps);
-    if (page === "students") return /*#__PURE__*/React.createElement(StudentsPage, commonProps);
-    if (page === "classes" || page === "myclasses") return /*#__PURE__*/React.createElement(ClassesPage, commonProps);
-    if (page === "schedule") return /*#__PURE__*/React.createElement(SchedulePage, commonProps);
-    if (page === "events") return /*#__PURE__*/React.createElement(EventsPage, commonProps);
-    if (page === "settings") return /*#__PURE__*/React.createElement(SettingsPage, commonProps);
-    // Admin only
-    if (page === "professors") return /*#__PURE__*/React.createElement(ProfessorsPage, commonProps);
-    if (page === "workhours") return /*#__PURE__*/React.createElement(WorkHoursPage, commonProps);
-    if (page === "reports") return /*#__PURE__*/React.createElement(ReportsPage, commonProps);
-    if (page === "users") return /*#__PURE__*/React.createElement(UsersPage, commonProps);
-    // Fallback
-    return /*#__PURE__*/React.createElement(Dashboard, commonProps);
+    if (page === "dashboard") return /*#__PURE__*/React.createElement(Dashboard, cp);
+    if (page === "students") return /*#__PURE__*/React.createElement(StudentsPage, cp);
+    if (page === "classes" || page === "myclasses") return /*#__PURE__*/React.createElement(ClassesPage, cp);
+    if (page === "payments") return /*#__PURE__*/React.createElement(PaymentsPage, cp);
+    if (page === "schedule") return /*#__PURE__*/React.createElement(SchedulePage, cp);
+    if (page === "events") return /*#__PURE__*/React.createElement(EventsPage, cp);
+    if (page === "settings") return /*#__PURE__*/React.createElement(SettingsPage, cp);
+    if (page === "professors") return /*#__PURE__*/React.createElement(ProfessorsPage, cp);
+    if (page === "workhours") return /*#__PURE__*/React.createElement(WorkHoursPage, cp);
+    if (page === "reports") return /*#__PURE__*/React.createElement(ReportsPage, cp);
+    if (page === "exports") return role === "admin" ? /*#__PURE__*/React.createElement(ExportsPage, cp) : /*#__PURE__*/React.createElement(Dashboard, cp);
+    if (page === "users") return role === "admin" ? /*#__PURE__*/React.createElement(UsersPage, cp) : /*#__PURE__*/React.createElement(Dashboard, cp);
+    return /*#__PURE__*/React.createElement(Dashboard, cp);
   };
   return /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       height: "100dvh",
-      background: "#0a0a0a",
+      background: th.bg,
       fontFamily: "'Inter',sans-serif",
-      overflow: "hidden"
+      overflow: "hidden",
+      transition: "background 0.3s"
     }
   }, /*#__PURE__*/React.createElement("style", null, `
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Crimson+Pro:ital,wght@1,300;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; }
         ::-webkit-scrollbar { width: 3px; height: 3px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.2); border-radius: 2px; }
         @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
         input, select, button, textarea { font-family: 'Inter', sans-serif; }
-        select option { background: #1a1a1a; color: #fff; }
-        input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.2); }
         button { -webkit-tap-highlight-color: transparent; }
         html { -webkit-text-size-adjust: 100%; }
       `), !mob && /*#__PURE__*/React.createElement(Sidebar, {
@@ -4290,7 +5376,10 @@ function App() {
     setPage: setPage,
     onLogout: handleLogout,
     collapsed: collapsed,
-    setCollapsed: setCollapsed
+    setCollapsed: setCollapsed,
+    th: th,
+    darkMode: darkMode,
+    setDarkMode: setDarkMode
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
@@ -4301,13 +5390,17 @@ function App() {
     }
   }, mob && /*#__PURE__*/React.createElement(MobHeader, {
     role: role,
-    title: pageTitles[page] || "Dashboard"
+    title: pageTitles[page] || "Dashboard",
+    th: th,
+    darkMode: darkMode,
+    setDarkMode: setDarkMode
   }), /*#__PURE__*/React.createElement("main", {
     style: {
       flex: 1,
       overflowY: "auto",
       padding: mob ? "16px 14px 88px" : "28px 32px",
-      WebkitOverflowScrolling: "touch"
+      WebkitOverflowScrolling: "touch",
+      background: th.bg
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -4319,19 +5412,20 @@ function App() {
   }, renderPage()))), mob && /*#__PURE__*/React.createElement(BotNav, {
     role: role,
     page: page,
-    setPage: handleSetPage
+    setPage: handleSetPage,
+    th: th
   }), showMore && /*#__PURE__*/React.createElement(MoreDrawer, {
     role: role,
     setPage: handleSetPage,
     onLogout: handleLogout,
-    onClose: () => setShowMore(false)
+    onClose: () => setShowMore(false),
+    th: th
   }), toast && /*#__PURE__*/React.createElement(Toast, {
     msg: toast.msg,
     type: toast.type
   }));
 }
-const _root=ReactDOM.createRoot(document.getElementById('root'));
-_root.render(React.createElement(App));
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
 })();
 </script>
 </body>
