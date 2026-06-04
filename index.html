@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0051)file:///C:/Users/Ben/Downloads/misbah-lms-v2_3.html -->
+<!-- saved from url=(0051)file:///C:/Users/Ben/Downloads/misbah-lms-v2_4.html -->
 <html lang="sq"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -8,17 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com/">
   <link href="./index_files/css2" rel="stylesheet">
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;overflow:hidden}
-    #root{height:100%}
+    *{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;overflow:hidden}#root{height:100%}
     @keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
     @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
     @keyframes spin{to{transform:rotate(360deg)}}
-    ::-webkit-scrollbar{width:3px;height:3px}
-    ::-webkit-scrollbar-track{background:transparent}
-    ::-webkit-scrollbar-thumb{background:rgba(128,128,128,0.2);border-radius:2px}
-    button{-webkit-tap-highlight-color:transparent}
-    input,select,textarea,button{font-family:'DM Sans',sans-serif}
+    ::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(128,128,128,0.2);border-radius:2px}
+    button{-webkit-tap-highlight-color:transparent}input,select,textarea,button{font-family:'DM Sans',sans-serif}
   </style>
 </head>
 <body>
@@ -323,9 +318,7 @@ var d=null!=c&&c.hydratedSources||null,e=!1,f="",g=aj;null!==c&&void 0!==c&&(!0=
 function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmountComponentAtNode=function(a){if(!Vd(a))throw Error(m(40));return a._reactRootContainer?(yb(function(){Wd(null,null,a,!1,function(){a._reactRootContainer=null;a[Ja]=null})}),!0):!1};Q.unstable_batchedUpdates=Tf;Q.unstable_renderSubtreeIntoContainer=function(a,b,c,d){if(!Vd(c))throw Error(m(200));if(null==a||void 0===a._reactInternals)throw Error(m(38));return Wd(a,b,c,!1,d)};Q.version="18.3.1-next-f1338f8080-20240426"});
 })();
 </script>
-<script>
-(function(){
-const {useState,useEffect,useRef}=React;
+<script>(function(){const {useState,useEffect,useRef}=React;
 function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const SUPABASE_URL = "https://xyrphosiclowqvjlwgbx.supabase.co";
@@ -1661,7 +1654,7 @@ const Login = ({
       // If role is student, find linked student record
       let studentRecord = null;
       if (profile.role === "student") {
-        const sr = await sb.select("nxënës", `?parent_email=eq.${profile.email}&limit=1`);
+        const sr = await sb.select("students", `?parent_email=eq.${profile.email}&limit=1`);
         if (sr.length) studentRecord = sr[0];
       }
       onLogin({
@@ -1918,7 +1911,7 @@ const BotNav = ({
       label: "Kryefaqja",
       icon: "home"
     }, {
-      key: "nxënës",
+      key: "students",
       label: "Nxënësit",
       icon: "users"
     }, {
@@ -2101,7 +2094,7 @@ const MoreDrawer = ({
       label: "Materialet",
       icon: "upload"
     }, {
-      key: "nxënës",
+      key: "students",
       label: "Nxënësit e Mi",
       icon: "users"
     }],
@@ -2237,7 +2230,7 @@ const Sidebar = ({
       label: "Paneli",
       icon: "home"
     }, {
-      key: "nxënës",
+      key: "students",
       label: "Nxënësit",
       icon: "users"
     }, {
@@ -2302,7 +2295,7 @@ const Sidebar = ({
       label: "Orët e Punës",
       icon: "clock"
     }, {
-      key: "nxënës",
+      key: "students",
       label: "Nxënësit e Mi",
       icon: "users"
     }],
@@ -2598,7 +2591,7 @@ const PaymentsPage = ({
   const load = async () => {
     setLoading(true);
     try {
-      const [p, s] = await Promise.all([sb.select("payments", "?order=year.desc,month"), sb.select("nxënës", "?order=name")]);
+      const [p, s] = await Promise.all([sb.select("payments", "?order=year.desc,month"), sb.select("students", "?order=name")]);
       setPayments(p);
       setStudents(s);
     } catch (e) {
@@ -3078,7 +3071,7 @@ const StudentsPage = ({
         if (allClasses.length) {
           const classNames = allClasses.map(c => c.name);
           // Load students whose class_name is in professor's classes
-          const allStudents = await sb.select("nxënës", "?order=name");
+          const allStudents = await sb.select("students", "?order=name");
           const myStudents = allStudents.filter(s => classNames.includes(s.class_name));
           const [p] = await Promise.all([sb.select("profiles", "?role=eq.parent&order=full_name")]);
           setStudents(myStudents);
@@ -3087,7 +3080,7 @@ const StudentsPage = ({
           return;
         }
       }
-      const [s, p] = await Promise.all([sb.select("nxënës", studentQuery), sb.select("profiles", "?role=eq.parent&order=full_name")]);
+      const [s, p] = await Promise.all([sb.select("students", studentQuery), sb.select("profiles", "?role=eq.parent&order=full_name")]);
       setStudents(s);
       setParents(p);
     } catch (e) {
@@ -3134,10 +3127,10 @@ const StudentsPage = ({
         }
       }
       if (modal === "add") {
-        await sb.insert("nxënës", payload);
+        await sb.insert("students", payload);
         toast("Nxënësi u shtua!");
       } else {
-        await sb.update("nxënës", modal.id, payload);
+        await sb.update("students", modal.id, payload);
         toast("U përditësua!");
       }
       setModal(null);
@@ -3151,7 +3144,7 @@ const StudentsPage = ({
   const del = async s => {
     if (!confirm(`Fshi ${s.name}?`)) return;
     try {
-      await sb.remove("nxënës", s.id);
+      await sb.remove("students", s.id);
       toast("U fshi");
       load();
     } catch (e) {
@@ -3789,8 +3782,8 @@ const ExportsPage = ({
       [type]: true
     }));
     try {
-      if (type === "nxënës") {
-        const rows = await sb.select("nxënës", "?order=name");
+      if (type === "students") {
+        const rows = await sb.select("students", "?order=name");
         downloadCSV("students.csv", toCSV(["Name", "DOB", "Instrument", "Level", "Class", "Year", "Parent", "Parent Email", "Parent Phone", "Attendance %", "Grade", "Progress %", "Teacher Notes"], rows.map(r => [r.name, r.dob, r.instrument, r.level, r.class_name, r.academic_year, r.parent_name, r.parent_email, r.parent_phone, r.attendance, r.grade, r.progress, r.teacher_notes])));
         toast("Nxënësit u eksportuan!");
       } else if (type === "payments") {
@@ -3814,7 +3807,7 @@ const ExportsPage = ({
         toast("Oraret u eksportuan!");
       } else if (type === "full") {
         // Download all as separate CSV files
-        const [students, payments, classes, professors, timesheets, profs2] = await Promise.all([sb.select("nxënës", "?order=name"), sb.select("payments", "?order=year.desc,month"), sb.select("classes", "?order=name"), sb.select("professors", "?order=name"), sb.select("timesheets", "?order=date"), sb.select("professors", "?order=name")]);
+        const [students, payments, classes, professors, timesheets, profs2] = await Promise.all([sb.select("students", "?order=name"), sb.select("payments", "?order=year.desc,month"), sb.select("classes", "?order=name"), sb.select("professors", "?order=name"), sb.select("timesheets", "?order=date"), sb.select("professors", "?order=name")]);
         const profMap = {};
         profs2.forEach(p => profMap[p.id] = p.name);
         // Download each with a small delay
@@ -3850,7 +3843,7 @@ const ExportsPage = ({
     }
   };
   const exportCards = [{
-    key: "nxënës",
+    key: "students",
     title: "Students",
     desc: "Të gjitha profilet e nxënësve, prezenca, notat, info prindërit",
     icon: "users",
@@ -4922,7 +4915,7 @@ const ReportsPage = ({
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    sb.select("nxënës", "?order=name").then(setStudents).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
+    sb.select("students", "?order=name").then(setStudents).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
   }, []);
   const avgAtt = students.length ? Math.round(students.reduce((s, x) => s + (x.attendance || 0), 0) / students.length) : 0;
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
@@ -5363,7 +5356,7 @@ const Dashboard = ({
   const month = MONTHS[new Date().getMonth()];
   const yr = new Date().getFullYear();
   useEffect(() => {
-    Promise.all([sb.select("nxënës", "?order=name"), sb.select("professors", "?select=id,name,email"), sb.select("classes", "?order=day,time"), sb.select("events", "?order=date&limit=4"), sb.select("payments", "?month=eq." + month + "&year=eq." + yr)]).then(([st, pr, cl, ev, pay]) => {
+    Promise.all([sb.select("students", "?order=name"), sb.select("professors", "?select=id,name,email"), sb.select("classes", "?order=day,time"), sb.select("events", "?order=date&limit=4"), sb.select("payments", "?month=eq." + month + "&year=eq." + yr)]).then(([st, pr, cl, ev, pay]) => {
       let mySt = st;
       let myCl = cl;
       if (role === "professor") {
@@ -5551,7 +5544,7 @@ const Dashboard = ({
         gap: 8,
         flexWrap: "wrap"
       }
-    }, c.professor && role === "admin" && /*#__PURE__*/React.createElement("span", null, "👨‍🏫 " + c.professor.replace("Prof. ", "")), c.room && /*#__PURE__*/React.createElement("span", null, "📍 " + c.room), c.students > 0 && /*#__PURE__*/React.createElement("span", null, c.students + " " + (lang === "sq" ? "nxënës" : "nxënës")))), /*#__PURE__*/React.createElement("div", {
+    }, c.professor && role === "admin" && /*#__PURE__*/React.createElement("span", null, "👨‍🏫 " + c.professor.replace("Prof. ", "")), c.room && /*#__PURE__*/React.createElement("span", null, "📍 " + c.room), c.students > 0 && /*#__PURE__*/React.createElement("span", null, c.students + " " + (lang === "sq" ? "students" : "students")))), /*#__PURE__*/React.createElement("div", {
       style: {
         textAlign: "center",
         flexShrink: 0
@@ -6018,8 +6011,8 @@ const ParentChildPage = ({
   const [loading, setLoading] = useState(true);
   const email = session?.profile?.email;
   useEffect(() => {
-    sb.select("nxënës", `?parent_email=eq.${email}&limit=1`).then(r => {
-      if (r.length) setStudent(r[0]);else sb.select("nxënës", "?order=name&limit=1").then(r2 => r2.length && setStudent(r2[0]));
+    sb.select("students", `?parent_email=eq.${email}&limit=1`).then(r => {
+      if (r.length) setStudent(r[0]);else sb.select("students", "?order=name&limit=1").then(r2 => r2.length && setStudent(r2[0]));
     }).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
   }, []);
   if (loading) return /*#__PURE__*/React.createElement(Spinner, {
@@ -6150,8 +6143,8 @@ const ParentAttendancePage = ({
   const [loading, setLoading] = useState(true);
   const email = session?.profile?.email;
   useEffect(() => {
-    sb.select("nxënës", `?parent_email=eq.${email}&limit=1`).then(r => {
-      if (r.length) setStudent(r[0]);else sb.select("nxënës", "?order=name&limit=1").then(r2 => r2.length && setStudent(r2[0]));
+    sb.select("students", `?parent_email=eq.${email}&limit=1`).then(r => {
+      if (r.length) setStudent(r[0]);else sb.select("students", "?order=name&limit=1").then(r2 => r2.length && setStudent(r2[0]));
     }).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
   }, []);
   if (loading) return /*#__PURE__*/React.createElement(Spinner, {
@@ -6261,8 +6254,8 @@ const ParentProgressPage = ({
   const [loading, setLoading] = useState(true);
   const email = session?.profile?.email;
   useEffect(() => {
-    sb.select("nxënës", `?parent_email=eq.${email}&limit=1`).then(r => {
-      if (r.length) setStudent(r[0]);else sb.select("nxënës", "?order=name&limit=1").then(r2 => r2.length && setStudent(r2[0]));
+    sb.select("students", `?parent_email=eq.${email}&limit=1`).then(r => {
+      if (r.length) setStudent(r[0]);else sb.select("students", "?order=name&limit=1").then(r2 => r2.length && setStudent(r2[0]));
     }).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
   }, []);
   if (loading) return /*#__PURE__*/React.createElement(Spinner, {
@@ -6559,7 +6552,7 @@ const ProfAttendancePage = ({
   const [loading, setLoading] = useState(true);
   const [att, setAtt] = useState({});
   useEffect(() => {
-    sb.select("nxënës", "?order=name").then(setStudents).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
+    sb.select("students", "?order=name").then(setStudents).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
   }, []);
   const toggle = id => setAtt(prev => ({
     ...prev,
@@ -8086,7 +8079,7 @@ function App() {
   };
   const renderPage = () => {
     if (page === "dashboard") return role === "student" ? /*#__PURE__*/React.createElement(StudentDashboard, cp) : /*#__PURE__*/React.createElement(Dashboard, cp);
-    if (page === "nxënës") return /*#__PURE__*/React.createElement(StudentsPage, cp);
+    if (page === "students") return /*#__PURE__*/React.createElement(StudentsPage, cp);
     if (page === "classes" || page === "myclasses") return /*#__PURE__*/React.createElement(ClassesPage, cp);
     if (page === "payments") return /*#__PURE__*/React.createElement(PaymentsPage, cp);
     if (page === "schedule") return /*#__PURE__*/React.createElement(SchedulePage, cp);
@@ -8195,7 +8188,6 @@ function App() {
   }));
 }
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
-})();
-</script>
+})();</script>
 
 </body></html>
