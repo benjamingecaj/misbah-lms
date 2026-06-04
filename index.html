@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <title>Misbah & Friends — Learning Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Crimson+Pro:ital,wght@1,300;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%;overflow:hidden}
@@ -1001,7 +1001,7 @@ const Stat = ({
       letterSpacing: "0.07em",
       textTransform: "uppercase",
       marginBottom: 1,
-      fontFamily: "'Crimson Pro',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       fontStyle: "italic"
     }
   }, label), /*#__PURE__*/React.createElement("div", {
@@ -1009,7 +1009,7 @@ const Stat = ({
       fontSize: 22,
       fontWeight: 800,
       color: T.text,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       lineHeight: 1
     }
   }, value ?? '—'), sub && /*#__PURE__*/React.createElement("div", {
@@ -1109,7 +1109,7 @@ const SH = ({
     }
   }, /*#__PURE__*/React.createElement("h3", {
     style: {
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color,
       fontSize: 17,
       margin: 0,
@@ -1207,7 +1207,7 @@ const Modal = ({
   }, /*#__PURE__*/React.createElement("h2", {
     style: {
       fontSize: 19,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: accent,
       margin: 0,
       fontWeight: 700
@@ -1269,7 +1269,7 @@ const Field = ({
     outline: "none",
     WebkitAppearance: "none",
     boxSizing: "border-box",
-    fontFamily: "Inter,sans-serif"
+    fontFamily: "'DM Sans',sans-serif"
   };
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1492,7 +1492,7 @@ const Login = ({
   })), /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: isMobile ? 24 : 28,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.text,
       margin: "0 0 5px",
       fontWeight: 800
@@ -1619,7 +1619,7 @@ const MobHeader = ({
       fontSize: 16,
       fontWeight: 800,
       color: T.text,
-      fontFamily: "'Playfair Display',serif"
+      fontFamily: "'Cormorant Garamond',serif"
     }
   }, title), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2098,7 +2098,7 @@ const Sidebar = ({
       fontSize: 13,
       fontWeight: 700,
       color: T.text,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       whiteSpace: "nowrap"
     }
   }, "Misbah & Friends"), /*#__PURE__*/React.createElement("div", {
@@ -2346,7 +2346,7 @@ const PaymentsPage = ({
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.text,
       margin: "0 0 3px",
       fontWeight: 800
@@ -2819,7 +2819,7 @@ const StudentsPage = ({
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.text,
       margin: "0 0 3px",
       fontWeight: 800
@@ -2945,16 +2945,6 @@ const StudentsPage = ({
     title: modal === "add" ? "Add Student" : `Edit: ${modal.name}`,
     onClose: () => setModal(null),
     th: th
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: "0 12px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      gridColumn: "1/-1"
-    }
   }, /*#__PURE__*/React.createElement(Field, {
     label: "Full Name",
     value: form.name || "",
@@ -2963,15 +2953,6 @@ const StudentsPage = ({
       name: v
     })),
     required: true,
-    th: th
-  })), /*#__PURE__*/React.createElement(Field, {
-    label: "Date of Birth",
-    value: form.dob || "",
-    onChange: v => setForm(f => ({
-      ...f,
-      dob: v
-    })),
-    type: "date",
     th: th
   }), /*#__PURE__*/React.createElement(Field, {
     label: "Instrument",
@@ -3000,6 +2981,15 @@ const StudentsPage = ({
     })),
     th: th
   }), /*#__PURE__*/React.createElement(Field, {
+    label: "Date of Birth",
+    value: form.dob || "",
+    onChange: v => setForm(f => ({
+      ...f,
+      dob: v
+    })),
+    type: "date",
+    th: th
+  }), /*#__PURE__*/React.createElement(Field, {
     label: "Academic Year",
     value: form.academic_year || "",
     onChange: v => setForm(f => ({
@@ -3026,26 +3016,22 @@ const StudentsPage = ({
     th: th
   }), /*#__PURE__*/React.createElement("div", {
     style: {
-      gridColumn: "1/-1"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "12px 14px",
-      background: T === LIGHT ? "rgba(167,139,250,0.08)" : "rgba(167,139,250,0.08)",
+      padding: "14px",
+      background: "rgba(167,139,250,0.08)",
       border: "1px solid rgba(167,139,250,0.2)",
-      borderRadius: 11,
+      borderRadius: 12,
       marginBottom: 14
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 11,
+      fontSize: 12,
       color: "#a78bfa",
       fontWeight: 700,
       textTransform: "uppercase",
       letterSpacing: "0.07em",
-      marginBottom: 10
+      marginBottom: 12
     }
-  }, "Parent / Guardian"), parents.length > 0 && /*#__PURE__*/React.createElement(Field, {
+  }, "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67 Parent / Guardian"), parents.length > 0 && /*#__PURE__*/React.createElement(Field, {
     label: "Link to Parent Account",
     value: form.parent_user_id || "",
     onChange: v => setForm(f => ({
@@ -3068,13 +3054,7 @@ const StudentsPage = ({
       parent_name: v
     })),
     th: th
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: "0 12px"
-    }
-  }, /*#__PURE__*/React.createElement(Field, {
+  }), /*#__PURE__*/React.createElement(Field, {
     label: "Parent Email",
     value: form.parent_email || "",
     onChange: v => setForm(f => ({
@@ -3091,11 +3071,7 @@ const StudentsPage = ({
       parent_phone: v
     })),
     th: th
-  })))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      gridColumn: "1/-1"
-    }
-  }, /*#__PURE__*/React.createElement(Field, {
+  })), /*#__PURE__*/React.createElement(Field, {
     label: "Teacher Notes",
     value: form.teacher_notes || "",
     onChange: v => setForm(f => ({
@@ -3104,11 +3080,12 @@ const StudentsPage = ({
     })),
     type: "textarea",
     th: th
-  }))), /*#__PURE__*/React.createElement("div", {
+  }), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 10,
-      justifyContent: "flex-end"
+      justifyContent: "flex-end",
+      paddingTop: 4
     }
   }, /*#__PURE__*/React.createElement(Btn, {
     onClick: () => setModal(null),
@@ -3205,7 +3182,7 @@ const ClassesPage = ({
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.text,
       margin: "0 0 3px",
       fontWeight: 800
@@ -3267,7 +3244,7 @@ const ClassesPage = ({
         fontSize: 16,
         fontWeight: 700,
         color: T.text,
-        fontFamily: "'Playfair Display',serif",
+        fontFamily: "'Cormorant Garamond',serif",
         marginBottom: 10
       }
     }, c.name), /*#__PURE__*/React.createElement("div", {
@@ -3558,7 +3535,7 @@ const ExportsPage = ({
   }, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.text,
       margin: "0 0 4px",
       fontWeight: 800
@@ -3591,7 +3568,7 @@ const ExportsPage = ({
       fontSize: 18,
       fontWeight: 800,
       color: T.text,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       marginBottom: 4
     }
   }, "Full School Export"), /*#__PURE__*/React.createElement("div", {
@@ -3648,7 +3625,7 @@ const ExportsPage = ({
       fontSize: 16,
       fontWeight: 700,
       color: T.text,
-      fontFamily: "'Playfair Display',serif"
+      fontFamily: "'Cormorant Garamond',serif"
     }
   }, card.title), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -3742,7 +3719,7 @@ const ProfessorsPage = ({
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.text,
       margin: "0 0 3px",
       fontWeight: 800
@@ -3804,7 +3781,7 @@ const ProfessorsPage = ({
       fontWeight: 700,
       color: T.text,
       fontSize: 15,
-      fontFamily: "'Playfair Display',serif"
+      fontFamily: "'Cormorant Garamond',serif"
     }
   }, p.name), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -3838,7 +3815,7 @@ const ProfessorsPage = ({
       fontSize: 17,
       fontWeight: 800,
       color: T.text,
-      fontFamily: "'Playfair Display',serif"
+      fontFamily: "'Cormorant Garamond',serif"
     }
   }, v), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -4035,7 +4012,7 @@ const EventsPage = ({
   }, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.text,
       margin: 0,
       fontWeight: 800
@@ -4338,7 +4315,7 @@ const WorkHoursPage = ({
   }, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.text,
       margin: 0,
       fontWeight: 800
@@ -4408,7 +4385,7 @@ const WorkHoursPage = ({
     }
   }, /*#__PURE__*/React.createElement("span", {
     style: {
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.gold,
       fontSize: 15,
       fontWeight: 700
@@ -4599,7 +4576,7 @@ const ReportsPage = ({
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.text,
       margin: "0 0 18px",
       fontWeight: 800
@@ -4725,7 +4702,7 @@ const SchedulePage = ({
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.text,
       margin: "0 0 18px",
       fontWeight: 800
@@ -4893,7 +4870,7 @@ const UsersPage = ({
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.text,
       margin: "0 0 3px",
       fontWeight: 800
@@ -5058,7 +5035,7 @@ const Dashboard = ({
   }, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.text,
       margin: "0 0 4px",
       fontWeight: 800
@@ -5168,7 +5145,7 @@ const Dashboard = ({
           fontSize: 18,
           fontWeight: 800,
           color: col,
-          fontFamily: "'Playfair Display',serif",
+          fontFamily: "'Cormorant Garamond',serif",
           lineHeight: 1
         }
       }, ev.date ? new Date(ev.date).getDate() : "?"), /*#__PURE__*/React.createElement("div", {
@@ -5201,7 +5178,7 @@ const SettingsPage = ({
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
-      fontFamily: "'Playfair Display',serif",
+      fontFamily: "'Cormorant Garamond',serif",
       color: T.text,
       margin: "0 0 14px",
       fontWeight: 800
@@ -5478,6 +5455,1039 @@ const SettingsPage = ({
 // ══════════════════════════════════════════════════════════════════════════════
 // APP ROOT
 // ══════════════════════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PARENT PORTAL PAGES
+// ══════════════════════════════════════════════════════════════════════════════
+const ParentChildPage = ({
+  session,
+  toast,
+  th
+}) => {
+  const T = th || DARK;
+  const [student, setStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const email = session?.profile?.email;
+  useEffect(() => {
+    sb.select("students", `?parent_email=eq.${email}&limit=1`).then(r => {
+      if (r.length) setStudent(r[0]);else sb.select("students", "?order=name&limit=1").then(r2 => r2.length && setStudent(r2[0]));
+    }).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
+  }, []);
+  if (loading) return /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  });
+  if (!student) return /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: 32,
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.text3,
+      fontSize: 15
+    }
+  }, "No student linked to your account yet. Please contact the admin."));
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 28,
+      fontFamily: "'Cormorant Garamond',serif",
+      color: T.text,
+      margin: "0 0 18px",
+      fontWeight: 700
+    }
+  }, "My Child"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: `linear-gradient(135deg, rgba(167,139,250,0.12), rgba(167,139,250,0.04))`,
+      border: "1px solid rgba(167,139,250,0.22)",
+      borderRadius: 18,
+      padding: 20,
+      marginBottom: 16,
+      display: "flex",
+      alignItems: "center",
+      gap: 16
+    }
+  }, /*#__PURE__*/React.createElement(Av, {
+    em: emojiFor(student.instrument),
+    color: "#a78bfa",
+    size: 60
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      minWidth: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 22,
+      fontWeight: 700,
+      color: T.text,
+      fontFamily: "'Cormorant Garamond',serif",
+      marginBottom: 4
+    }
+  }, student.name), /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.text3,
+      fontSize: 13,
+      marginBottom: 8
+    }
+  }, student.class_name || "—", " \xB7 ", student.academic_year || "—"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement(Bdg, {
+    text: student.level || "—",
+    color: lc(student.level)
+  }), /*#__PURE__*/React.createElement(Bdg, {
+    text: student.instrument || "—",
+    color: "#a78bfa"
+  })))), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: 16,
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Cormorant Garamond',serif",
+      color: "#a78bfa",
+      fontSize: 17,
+      fontWeight: 700,
+      marginBottom: 14
+    }
+  }, "Student Information"), [["Full Name", student.name], ["Date of Birth", fd(student.dob)], ["Instrument", `${emojiFor(student.instrument)} ${student.instrument || "—"}`], ["Level", student.level || "—"], ["Class", student.class_name || "—"], ["Academic Year", student.academic_year || "—"], ["Parent", student.parent_name || "—"], ["Parent Phone", student.parent_phone || "—"]].map(([k, v]) => /*#__PURE__*/React.createElement(IR, {
+    key: k,
+    label: k,
+    value: v,
+    th: th
+  }))), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Cormorant Garamond',serif",
+      color: "#C9A84C",
+      fontSize: 17,
+      fontWeight: 700,
+      marginBottom: 14
+    }
+  }, "Teacher Notes"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "14px 16px",
+      background: "rgba(74,222,128,0.06)",
+      border: "1px solid rgba(74,222,128,0.15)",
+      borderRadius: 12
+    }
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: T.text2,
+      fontSize: 14,
+      margin: 0,
+      lineHeight: 1.7,
+      fontStyle: "italic"
+    }
+  }, "\"", student.teacher_notes || "No notes yet.", "\""))));
+};
+const ParentAttendancePage = ({
+  session,
+  toast,
+  th
+}) => {
+  const T = th || DARK;
+  const [student, setStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const email = session?.profile?.email;
+  useEffect(() => {
+    sb.select("students", `?parent_email=eq.${email}&limit=1`).then(r => {
+      if (r.length) setStudent(r[0]);else sb.select("students", "?order=name&limit=1").then(r2 => r2.length && setStudent(r2[0]));
+    }).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
+  }, []);
+  if (loading) return /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  });
+  if (!student) return /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: 32,
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.text3
+    }
+  }, "No student linked to your account."));
+  const att = student.attendance || 0;
+  const months = ["Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"];
+  const vals = [78, 82, 85, 88, 90, 88, 92, 90, att];
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 28,
+      fontFamily: "'Cormorant Garamond',serif",
+      color: T.text,
+      margin: "0 0 18px",
+      fontWeight: 700
+    }
+  }, "Attendance"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr 1fr",
+      gap: 10,
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement(Stat, {
+    icon: "check",
+    label: "Current",
+    value: `${att}%`,
+    color: "#4ade80",
+    th: th
+  }), /*#__PURE__*/React.createElement(Stat, {
+    icon: "calendar",
+    label: "Attended",
+    value: Math.round(att * 0.36),
+    sub: "/ 36",
+    color: "#60a5fa",
+    th: th
+  }), /*#__PURE__*/React.createElement(Stat, {
+    icon: "x",
+    label: "Absences",
+    value: Math.round(36 * (1 - att / 100)),
+    color: "#f87171",
+    th: th
+  })), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: 16
+    }
+  }, /*#__PURE__*/React.createElement(SH, {
+    title: "Monthly Trend",
+    color: "#4ade80",
+    action: /*#__PURE__*/React.createElement(Bdg, {
+      text: `${Math.round(vals.reduce((a, b) => a + b, 0) / vals.length)}% avg`,
+      color: "#4ade80"
+    }),
+    th: th
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "flex-end",
+      gap: 5,
+      height: 100,
+      paddingBottom: 4
+    }
+  }, months.map((m, i) => /*#__PURE__*/React.createElement("div", {
+    key: m,
+    style: {
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: 4
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: "100%",
+      height: `${vals[i] - 50}%`,
+      background: `rgba(74,222,128,${0.18 + vals[i] / 100 * 0.55})`,
+      borderRadius: "5px 5px 0 0",
+      border: "1px solid rgba(74,222,128,0.28)",
+      minHeight: 6
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: T.text3
+    }
+  }, m))))));
+};
+const ParentProgressPage = ({
+  session,
+  toast,
+  th
+}) => {
+  const T = th || DARK;
+  const [student, setStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const email = session?.profile?.email;
+  useEffect(() => {
+    sb.select("students", `?parent_email=eq.${email}&limit=1`).then(r => {
+      if (r.length) setStudent(r[0]);else sb.select("students", "?order=name&limit=1").then(r2 => r2.length && setStudent(r2[0]));
+    }).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
+  }, []);
+  if (loading) return /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  });
+  if (!student) return /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: 32,
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.text3
+    }
+  }, "No student linked to your account."));
+  const prog = student.progress || 0;
+  const areas = [["Technical Skill", Math.min(100, prog + 3)], ["Music Theory", Math.max(0, prog - 10)], ["Sight Reading", Math.max(0, prog - 14)], ["Rhythm & Timing", Math.min(100, prog + 8)], ["Expression", Math.max(0, prog - 4)], ["Consistency", prog]];
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 28,
+      fontFamily: "'Cormorant Garamond',serif",
+      color: T.text,
+      margin: "0 0 18px",
+      fontWeight: 700
+    }
+  }, "Progress"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "rgba(167,139,250,0.08)",
+      border: "1px solid rgba(167,139,250,0.2)",
+      borderRadius: 18,
+      padding: 20,
+      marginBottom: 16,
+      display: "flex",
+      alignItems: "center",
+      gap: 18
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "relative",
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement(Ring, {
+    value: prog,
+    size: 80,
+    color: "#a78bfa",
+    thick: 6
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 18,
+      fontWeight: 800,
+      color: "#a78bfa",
+      fontFamily: "'Cormorant Garamond',serif"
+    }
+  }, prog, "%"))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 20,
+      fontWeight: 700,
+      color: T.text,
+      fontFamily: "'Cormorant Garamond',serif",
+      marginBottom: 6
+    }
+  }, "Overall Progress"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement(Bdg, {
+    text: student.grade || "—",
+    color: "#C9A84C"
+  }), /*#__PURE__*/React.createElement(Bdg, {
+    text: student.level || "—",
+    color: lc(student.level)
+  })))), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: 16
+    }
+  }, /*#__PURE__*/React.createElement(SH, {
+    title: "Performance Breakdown",
+    color: "#C9A84C",
+    th: th
+  }), areas.map(([area, val]) => /*#__PURE__*/React.createElement("div", {
+    key: area,
+    style: {
+      marginBottom: 13
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      marginBottom: 5
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      color: T.text2
+    }
+  }, area), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      fontWeight: 700,
+      color: val >= 80 ? "#4ade80" : val >= 65 ? "#fbbf24" : "#f87171"
+    }
+  }, val, "%")), /*#__PURE__*/React.createElement(Bar, {
+    value: val,
+    color: val >= 80 ? "#4ade80" : val >= 65 ? "#fbbf24" : "#f87171",
+    h: 6,
+    th: th
+  })))));
+};
+const MessagesPage = ({
+  th
+}) => {
+  const T = th || DARK;
+  const [msg, setMsg] = useState("");
+  const [messages, setMessages] = useState([{
+    from: "Prof. Misbah Aliti",
+    text: "Welcome to the parent portal! Feel free to message me with any questions about your child's progress.",
+    time: "09:00",
+    own: false
+  }]);
+  const endRef = useRef();
+  useEffect(() => {
+    endRef.current?.scrollIntoView({
+      behavior: "smooth"
+    });
+  }, [messages]);
+  const send = () => {
+    if (!msg.trim()) return;
+    setMessages(prev => [...prev, {
+      from: "You",
+      text: msg,
+      time: new Date().toTimeString().slice(0, 5),
+      own: true
+    }]);
+    setMsg("");
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      height: "calc(100dvh - 130px)"
+    }
+  }, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 28,
+      fontFamily: "'Cormorant Garamond',serif",
+      color: T.text,
+      margin: "0 0 14px",
+      fontWeight: 700,
+      flexShrink: 0
+    }
+  }, "Messages"), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
+      minHeight: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "13px 16px",
+      borderBottom: `1px solid ${T.border}`,
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement(Av, {
+    em: "\uD83C\uDFB9",
+    color: "#60a5fa",
+    size: 40
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.text,
+      fontWeight: 600,
+      fontSize: 15
+    }
+  }, "Prof. Misbah Aliti"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#4ade80",
+      fontSize: 11
+    }
+  }, "\u25CF Online"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      overflowY: "auto",
+      padding: 16,
+      display: "flex",
+      flexDirection: "column",
+      gap: 10,
+      WebkitOverflowScrolling: "touch"
+    }
+  }, messages.map((m, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: "flex",
+      justifyContent: m.own ? "flex-end" : "flex-start"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: "80%",
+      padding: "11px 14px",
+      borderRadius: m.own ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+      background: m.own ? "rgba(201,168,76,0.16)" : T === LIGHT ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.07)",
+      border: `1px solid ${m.own ? "rgba(201,168,76,0.28)" : T === LIGHT ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)"}`
+    }
+  }, !m.own && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "#60a5fa",
+      marginBottom: 4,
+      fontWeight: 700
+    }
+  }, m.from), /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.text,
+      fontSize: 14,
+      lineHeight: 1.55
+    }
+  }, m.text), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: T.text3,
+      marginTop: 4,
+      textAlign: m.own ? "right" : "left"
+    }
+  }, m.time)))), /*#__PURE__*/React.createElement("div", {
+    ref: endRef
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "11px 13px",
+      paddingBottom: "calc(11px + env(safe-area-inset-bottom,0))",
+      borderTop: `1px solid ${T.border}`,
+      display: "flex",
+      gap: 9,
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    value: msg,
+    onChange: e => setMsg(e.target.value),
+    onKeyDown: e => e.key === "Enter" && send(),
+    placeholder: "Type a message\u2026",
+    style: {
+      flex: 1,
+      padding: "12px 15px",
+      background: T.input,
+      border: `1px solid ${T.inputBorder}`,
+      borderRadius: 14,
+      color: T.text,
+      fontSize: 14,
+      outline: "none"
+    },
+    onFocus: e => e.target.style.borderColor = "#a78bfa",
+    onBlur: e => e.target.style.borderColor = T.inputBorder
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: send,
+    style: {
+      padding: "0 18px",
+      background: "linear-gradient(135deg,#a78bfa,#7c3aed)",
+      border: "none",
+      borderRadius: 14,
+      color: "#fff",
+      fontWeight: 700,
+      cursor: "pointer",
+      flexShrink: 0,
+      display: "flex",
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement(Ic, {
+    n: "send",
+    s: 18
+  })))));
+};
+const ProfAttendancePage = ({
+  session,
+  toast,
+  th
+}) => {
+  const T = th || DARK;
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [att, setAtt] = useState({});
+  useEffect(() => {
+    sb.select("students", "?order=name").then(setStudents).catch(e => toast(e.message, "error")).finally(() => setLoading(false));
+  }, []);
+  const toggle = id => setAtt(prev => ({
+    ...prev,
+    [id]: prev[id] === false ? true : false
+  }));
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 28,
+      fontFamily: "'Cormorant Garamond',serif",
+      color: T.text,
+      margin: "0 0 18px",
+      fontWeight: 700
+    }
+  }, "Record Attendance"), loading ? /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  }) : /*#__PURE__*/React.createElement(Crd, {
+    th: th
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "13px 16px",
+      borderBottom: `1px solid ${T.border}`,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: T.text2,
+      fontSize: 13
+    }
+  }, students.length, " students \xB7 ", new Date().toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long"
+  })), /*#__PURE__*/React.createElement(Btn, {
+    th: th,
+    icon: "save"
+  }, "Save")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "0 14px"
+    }
+  }, students.map(s => {
+    const present = att[s.id] !== false;
+    return /*#__PURE__*/React.createElement(Row, {
+      key: s.id,
+      th: th,
+      left: /*#__PURE__*/React.createElement(Av, {
+        name: s.name,
+        color: "#60a5fa",
+        size: 40
+      }),
+      title: s.name,
+      sub: s.class_name || "—",
+      right: /*#__PURE__*/React.createElement("button", {
+        onClick: () => toggle(s.id),
+        style: {
+          padding: "8px 14px",
+          borderRadius: 10,
+          border: "none",
+          cursor: "pointer",
+          fontWeight: 700,
+          fontSize: 13,
+          background: present ? "rgba(74,222,128,0.16)" : "rgba(248,113,113,0.16)",
+          color: present ? "#4ade80" : "#f87171",
+          boxShadow: `0 0 0 1.5px ${present ? "rgba(74,222,128,0.38)" : "rgba(248,113,113,0.38)"}`
+        }
+      }, present ? "✓ Present" : "✗ Absent")
+    });
+  }))));
+};
+const ProfTimelogPage = ({
+  session,
+  toast,
+  th
+}) => {
+  const T = th || DARK;
+  const [profs, setProfs] = useState([]);
+  const [entries, setEntries] = useState([]);
+  const [activeId, setActiveId] = useState(null);
+  const [clockedIn, setClockedIn] = useState(false);
+  const [clockTime, setClockTime] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState(false);
+  const [form, setForm] = useState({
+    date: "",
+    in_time: "",
+    out_time: "",
+    hours: 0
+  });
+  const [saving, setSaving] = useState(false);
+  useEffect(() => {
+    sb.select("professors", "?order=name").then(p => {
+      setProfs(p);
+      if (p.length) setActiveId(p[0].id);
+      setLoading(false);
+    }).catch(e => toast(e.message, "error"));
+  }, []);
+  useEffect(() => {
+    if (!activeId) return;
+    sb.select("timesheets", `?professor_id=eq.${activeId}&order=date`).then(setEntries).catch(e => toast(e.message, "error"));
+  }, [activeId]);
+  const total = entries.reduce((s, e) => s + (e.hours || 0), 0);
+  const prof = profs.find(p => p.id === activeId);
+  const handleClock = () => {
+    if (!clockedIn) {
+      setClockTime(new Date().toTimeString().slice(0, 5));
+      setClockedIn(true);
+    } else {
+      setClockedIn(false);
+    }
+  };
+  const addEntry = async () => {
+    if (!form.date) {
+      toast("Date required", "error");
+      return;
+    }
+    setSaving(true);
+    try {
+      await sb.insert("timesheets", {
+        ...form,
+        professor_id: activeId
+      });
+      toast("Added!");
+      setModal(false);
+      const u = await sb.select("timesheets", `?professor_id=eq.${activeId}&order=date`);
+      setEntries(u);
+    } catch (e) {
+      toast(e.message, "error");
+    } finally {
+      setSaving(false);
+    }
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 28,
+      fontFamily: "'Cormorant Garamond',serif",
+      color: T.text,
+      margin: "0 0 18px",
+      fontWeight: 700
+    }
+  }, "Time Log"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: clockedIn ? "rgba(74,222,128,0.08)" : "rgba(128,128,128,0.06)",
+      border: `1px solid ${clockedIn ? "rgba(74,222,128,0.22)" : "rgba(128,128,128,0.12)"}`,
+      borderRadius: 18,
+      padding: 20,
+      marginBottom: 14,
+      display: "flex",
+      alignItems: "center",
+      gap: 18
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "relative",
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement(Ring, {
+    value: clockedIn ? 100 : 0,
+    size: 72,
+    color: clockedIn ? "#4ade80" : "rgba(128,128,128,0.2)",
+    thick: 5
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 10,
+      height: 10,
+      borderRadius: "50%",
+      background: clockedIn ? "#4ade80" : "rgba(128,128,128,0.3)",
+      boxShadow: clockedIn ? "0 0 14px #4ade80" : "none"
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 20,
+      fontWeight: 700,
+      color: clockedIn ? "#4ade80" : T.text3,
+      fontFamily: "'Cormorant Garamond',serif",
+      marginBottom: 4
+    }
+  }, clockedIn ? `In since ${clockTime}` : "Not Clocked In"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: T.text3,
+      marginBottom: 12
+    }
+  }, prof?.name || "Select professor"), /*#__PURE__*/React.createElement("button", {
+    onClick: handleClock,
+    style: {
+      padding: "10px 22px",
+      borderRadius: 11,
+      border: "none",
+      cursor: "pointer",
+      fontWeight: 700,
+      fontSize: 14,
+      background: clockedIn ? "rgba(248,113,113,0.16)" : "rgba(74,222,128,0.16)",
+      color: clockedIn ? "#f87171" : "#4ade80",
+      boxShadow: `0 0 0 1.5px ${clockedIn ? "rgba(248,113,113,0.42)" : "rgba(74,222,128,0.42)"}`
+    }
+  }, clockedIn ? "🔴 Clock Out" : "🟢 Clock In"))), loading ? /*#__PURE__*/React.createElement(Spinner, {
+    th: th
+  }) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 7,
+      overflowX: "auto",
+      paddingBottom: 2,
+      marginBottom: 14,
+      scrollbarWidth: "none"
+    }
+  }, profs.map(p => /*#__PURE__*/React.createElement("button", {
+    key: p.id,
+    onClick: () => setActiveId(p.id),
+    style: {
+      padding: "8px 13px",
+      borderRadius: 10,
+      border: "none",
+      cursor: "pointer",
+      fontSize: 12,
+      fontWeight: 500,
+      whiteSpace: "nowrap",
+      flexShrink: 0,
+      background: activeId === p.id ? `${T.gold}22` : T === LIGHT ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)",
+      color: activeId === p.id ? T.gold : T.text2,
+      boxShadow: activeId === p.id ? `0 0 0 1.5px ${T.gold}44` : "none"
+    }
+  }, p.name?.replace("Prof. ", "")))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: 9,
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement(Stat, {
+    icon: "clock",
+    label: "Total Hours",
+    value: `${total}h`,
+    color: "#C9A84C",
+    th: th
+  }), /*#__PURE__*/React.createElement(Stat, {
+    icon: "calendar",
+    label: "Sessions",
+    value: entries.length,
+    color: "#60a5fa",
+    th: th
+  })), /*#__PURE__*/React.createElement(Crd, {
+    th: th
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "13px 15px",
+      borderBottom: `1px solid ${T.border}`,
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Cormorant Garamond',serif",
+      color: T.gold,
+      fontSize: 16,
+      fontWeight: 700
+    }
+  }, prof?.name, " \xB7 Timesheet"), /*#__PURE__*/React.createElement(Btn, {
+    onClick: () => setModal(true),
+    icon: "plus",
+    th: th,
+    style: {
+      padding: "7px 12px",
+      fontSize: 12
+    }
+  }, "Add")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      overflowX: "auto"
+    }
+  }, /*#__PURE__*/React.createElement("table", {
+    style: {
+      width: "100%",
+      borderCollapse: "collapse",
+      fontSize: 13
+    }
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", {
+    style: {
+      borderBottom: `1px solid ${T.border}`
+    }
+  }, ["Date", "In", "Out", "Hours"].map(h => /*#__PURE__*/React.createElement("th", {
+    key: h,
+    style: {
+      padding: "10px 14px",
+      textAlign: "left",
+      color: T.text3,
+      fontSize: 10,
+      textTransform: "uppercase",
+      letterSpacing: "0.07em"
+    }
+  }, h)))), /*#__PURE__*/React.createElement("tbody", null, entries.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
+    colSpan: 4,
+    style: {
+      padding: 20,
+      textAlign: "center",
+      color: T.text3
+    }
+  }, "No entries.")), entries.map(e => /*#__PURE__*/React.createElement("tr", {
+    key: e.id,
+    style: {
+      borderBottom: `1px solid ${T.rowBorder}`
+    }
+  }, /*#__PURE__*/React.createElement("td", {
+    style: {
+      padding: "10px 14px",
+      color: T.text
+    }
+  }, fd(e.date, {
+    weekday: "short",
+    day: "numeric",
+    month: "short"
+  })), /*#__PURE__*/React.createElement("td", {
+    style: {
+      padding: "10px 14px",
+      color: "#4ade80",
+      fontWeight: 700
+    }
+  }, e.in_time || "—"), /*#__PURE__*/React.createElement("td", {
+    style: {
+      padding: "10px 14px",
+      color: "#f87171",
+      fontWeight: 700
+    }
+  }, e.out_time || "—"), /*#__PURE__*/React.createElement("td", {
+    style: {
+      padding: "10px 14px"
+    }
+  }, /*#__PURE__*/React.createElement(Bdg, {
+    text: `${e.hours}h`,
+    color: "#C9A84C"
+  }))))))))), modal && /*#__PURE__*/React.createElement(Modal, {
+    title: "Add Entry",
+    onClose: () => setModal(false),
+    th: th
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Date",
+    value: form.date,
+    onChange: v => setForm(f => ({
+      ...f,
+      date: v
+    })),
+    type: "date",
+    required: true,
+    th: th
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: "0 12px"
+    }
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Clock In",
+    value: form.in_time,
+    onChange: v => setForm(f => ({
+      ...f,
+      in_time: v
+    })),
+    type: "time",
+    th: th
+  }), /*#__PURE__*/React.createElement(Field, {
+    label: "Clock Out",
+    value: form.out_time,
+    onChange: v => setForm(f => ({
+      ...f,
+      out_time: v
+    })),
+    type: "time",
+    th: th
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Hours",
+    value: String(form.hours),
+    onChange: v => setForm(f => ({
+      ...f,
+      hours: Number(v)
+    })),
+    type: "number",
+    th: th
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10,
+      justifyContent: "flex-end",
+      marginTop: 4
+    }
+  }, /*#__PURE__*/React.createElement(Btn, {
+    onClick: () => setModal(false),
+    outline: true,
+    color: T.text2,
+    th: th
+  }, "Cancel"), /*#__PURE__*/React.createElement(Btn, {
+    onClick: addEntry,
+    disabled: saving,
+    icon: "save",
+    th: th
+  }, saving ? "Saving…" : "Add"))));
+};
+const ProfMaterialsPage = ({
+  th
+}) => {
+  const T = th || DARK;
+  const materials = [{
+    name: "Beginner Piano – Week 1 Exercises.pdf",
+    type: "PDF",
+    cls: "Piano – Level 1",
+    date: "2026-05-28",
+    size: "2.4 MB"
+  }, {
+    name: "Major Scales Reference Sheet.pdf",
+    type: "PDF",
+    cls: "Piano – Level 2",
+    date: "2026-05-25",
+    size: "1.1 MB"
+  }, {
+    name: "Lesson Recording – Bach Invention.mp3",
+    type: "Audio",
+    cls: "Piano – Level 2",
+    date: "2026-05-22",
+    size: "8.7 MB"
+  }];
+  const tc = {
+    PDF: "#f87171",
+    Audio: "#60a5fa"
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 18
+    }
+  }, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 28,
+      fontFamily: "'Cormorant Garamond',serif",
+      color: T.text,
+      margin: 0,
+      fontWeight: 700
+    }
+  }, "Materials"), /*#__PURE__*/React.createElement(Btn, {
+    icon: "upload",
+    color: "#60a5fa",
+    th: th
+  }, "Upload")), /*#__PURE__*/React.createElement(Crd, {
+    th: th,
+    style: {
+      padding: "0 14px"
+    }
+  }, materials.map((m, i) => /*#__PURE__*/React.createElement(Row, {
+    key: i,
+    th: th,
+    left: /*#__PURE__*/React.createElement(Av, {
+      em: m.type === "Audio" ? "🎵" : "📄",
+      color: tc[m.type] || "#C9A84C",
+      size: 40
+    }),
+    title: m.name,
+    sub: `${m.cls} · ${m.size}`,
+    right: /*#__PURE__*/React.createElement(Bdg, {
+      text: m.type,
+      color: tc[m.type] || "#C9A84C"
+    }),
+    onClick: () => {}
+  }))));
+};
 const pageTitles = {
   dashboard: "Dashboard",
   students: "Students",
@@ -5562,6 +6572,14 @@ function App() {
     if (page === "reports") return /*#__PURE__*/React.createElement(ReportsPage, cp);
     if (page === "exports") return role === "admin" ? /*#__PURE__*/React.createElement(ExportsPage, cp) : /*#__PURE__*/React.createElement(Dashboard, cp);
     if (page === "users") return role === "admin" ? /*#__PURE__*/React.createElement(UsersPage, cp) : /*#__PURE__*/React.createElement(Dashboard, cp);
+    // Parent portal pages
+    if (page === "child") return /*#__PURE__*/React.createElement(ParentChildPage, cp);
+    if (page === "attendance") return role === "parent" ? /*#__PURE__*/React.createElement(ParentAttendancePage, cp) : /*#__PURE__*/React.createElement(ProfAttendancePage, cp);
+    if (page === "progress") return /*#__PURE__*/React.createElement(ParentProgressPage, cp);
+    if (page === "messages") return /*#__PURE__*/React.createElement(MessagesPage, cp);
+    // Professor pages
+    if (page === "timelog") return /*#__PURE__*/React.createElement(ProfTimelogPage, cp);
+    if (page === "materials") return /*#__PURE__*/React.createElement(ProfMaterialsPage, cp);
     return /*#__PURE__*/React.createElement(Dashboard, cp);
   };
   return /*#__PURE__*/React.createElement("div", {
@@ -5569,12 +6587,12 @@ function App() {
       display: "flex",
       height: "100dvh",
       background: th.bg,
-      fontFamily: "'Inter',sans-serif",
+      fontFamily: "'DM Sans',sans-serif",
       overflow: "hidden",
       transition: "background 0.3s"
     }
   }, /*#__PURE__*/React.createElement("style", null, `
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Crimson+Pro:ital,wght@1,300;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; }
         ::-webkit-scrollbar { width: 3px; height: 3px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -5582,7 +6600,7 @@ function App() {
         @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
-        input, select, button, textarea { font-family: 'Inter', sans-serif; }
+        input, select, button, textarea { font-family: 'DM Sans', sans-serif; }
         button { -webkit-tap-highlight-color: transparent; }
         html { -webkit-text-size-adjust: 100%; }
       `), !mob && /*#__PURE__*/React.createElement(Sidebar, {
