@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0051)file:///C:/Users/Ben/Downloads/misbah-lms-v2_1.html -->
+<!-- saved from url=(0051)file:///C:/Users/Ben/Downloads/misbah-lms-v2_2.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -11,6 +11,15 @@
     *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%;overflow:hidden}
     #root{height:100%}
+    @keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    ::-webkit-scrollbar{width:3px;height:3px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:rgba(128,128,128,0.2);border-radius:2px}
+    button{-webkit-tap-highlight-color:transparent}
+    input,select,textarea,button{font-family:'DM Sans',sans-serif}
+    select option{background:#fff;color:#000}
   </style>
 </head>
 <body>
@@ -1799,7 +1808,9 @@ const MobHeader = ({
   title,
   th,
   darkMode,
-  setDarkMode
+  setDarkMode,
+  lang,
+  toggleLang
 }) => {
   const T = th || DARK;
   const c = rc(role);
@@ -2050,7 +2061,9 @@ const MoreDrawer = ({
   setPage,
   onLogout,
   onClose,
-  th
+  th,
+  lang,
+  toggleLang
 }) => {
   const T = th || DARK;
   const c = rc(role);
@@ -2213,7 +2226,9 @@ const Sidebar = ({
   setCollapsed,
   th,
   darkMode,
-  setDarkMode
+  setDarkMode,
+  lang,
+  toggleLang
 }) => {
   const T = th || DARK;
   const c = rc(role);
@@ -8006,7 +8021,13 @@ function App() {
   const [showMore, setShowMore] = useState(false);
   const [toast, setToastState] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
-  const [lang, setLang] = useState(localStorage.getItem("mf_lang") || "en");
+  const [lang, setLang] = useState(() => {
+    try {
+      return localStorage.getItem("mf_lang") || "en";
+    } catch (e) {
+      return "en";
+    }
+  });
   const t = TR[lang] || TR.en;
   const toggleLang = () => {
     const nl = lang === "en" ? "sq" : "en";
@@ -8122,7 +8143,9 @@ function App() {
     setCollapsed: setCollapsed,
     th: th,
     darkMode: darkMode,
-    setDarkMode: setDarkMode
+    setDarkMode: setDarkMode,
+    lang: lang,
+    toggleLang: toggleLang
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
@@ -8136,7 +8159,9 @@ function App() {
     title: pageTitles[page] || "Dashboard",
     th: th,
     darkMode: darkMode,
-    setDarkMode: setDarkMode
+    setDarkMode: setDarkMode,
+    lang: lang,
+    toggleLang: toggleLang
   }), /*#__PURE__*/React.createElement("main", {
     style: {
       flex: 1,
@@ -8162,7 +8187,9 @@ function App() {
     setPage: handleSetPage,
     onLogout: handleLogout,
     onClose: () => setShowMore(false),
-    th: th
+    th: th,
+    lang: lang,
+    toggleLang: toggleLang
   }), toast && /*#__PURE__*/React.createElement(Toast, {
     msg: toast.msg,
     type: toast.type
