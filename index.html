@@ -2249,29 +2249,45 @@ const PaymentsPage = ({
   toast,
   th
 }) => {
+  const h = React.createElement;
   const T = th || DARK;
   const [payments, setPayments] = useState([]);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null);
-  const [form, setForm] = useState({
-    student_id: "",
-    student_name: "",
-    month: "",
-    year: new Date().getFullYear(),
-    amount: "",
-    method: "cash",
-    notes: ""
-  });
   const [saving, setSaving] = useState(false);
   const [filterStudent, setFilterStudent] = useState("");
   const currentYear = new Date().getFullYear();
   const [selMonth, setSelMonth] = useState(MONTHS[new Date().getMonth()]);
   const [selYear, setSelYear] = useState(currentYear);
+  const [paymentView, setPaymentView] = useState("unpaid");
+  const [form, setForm] = useState({
+    student_id: "",
+    student_name: "",
+    month: "",
+    year: currentYear,
+    amount: "",
+    method: "cash",
+    notes: ""
+  });
+
+  const years = [currentYear - 1, currentYear, currentYear + 1];
+  const methodColor = {
+    cash: "#4ade80",
+    bank: "#60a5fa",
+    card: "#a78bfa"
+  };
+  const money = n => `€${Number(n || 0).toLocaleString("en-GB", {
+    maximumFractionDigits: 2
+  })}`;
+
   const load = async () => {
     setLoading(true);
     try {
-      const [p, s] = await Promise.all([sb.select("payments", "?order=year.desc,month"), sb.select("students", "?order=name")]);
+      const [p, s] = await Promise.all([
+        sb.select("payments", "?order=year.desc,month"),
+        sb.select("students", "?order=name")
+      ]);
       setPayments(p);
       setStudents(s);
     } catch (e) {
@@ -2280,22 +2296,39 @@ const PaymentsPage = ({
       setLoading(false);
     }
   };
+
   useEffect(() => {
     load();
   }, []);
+
   const save = async () => {
     if (!form.student_id || !form.month || !form.amount) {
       toast("Student, month and amount required", "error");
       return;
     }
+
+    if (modal === "add") {
+      const alreadyPaid = payments.some(p =>
+        p.student_id === form.student_id &&
+        p.month === form.month &&
+        Number(p.year) === Number(form.year)
+      );
+      if (alreadyPaid) {
+        toast("This student is already marked as paid for this month.", "error");
+        return;
+      }
+    }
+
     setSaving(true);
     try {
       const s = students.find(x => x.id === form.student_id);
       const payload = {
         ...form,
         student_name: s?.name || "",
-        amount: Number(form.amount)
+        amount: Number(form.amount),
+        year: Number(form.year)
       };
+
       if (modal === "add") {
         await sb.insert("payments", payload);
         toast("Payment recorded!");
@@ -2303,38 +2336,34 @@ const PaymentsPage = ({
         await sb.update("payments", modal.id, payload);
         toast("Updated!");
       }
+
       setModal(null);
-      load();
+      await load();
     } catch (e) {
       toast(e.message, "error");
     } finally {
       setSaving(false);
     }
   };
+
   const del = async p => {
     if (!confirm(`Delete payment for ${p.student_name}?`)) return;
     try {
       await sb.remove("payments", p.id);
       toast("Deleted");
-      load();
+      await load();
     } catch (e) {
       toast(e.message, "error");
     }
   };
-  const filtered = payments.filter(p => !filterStudent || p.student_id === filterStudent);
-  const methodColor = {
-    cash: "#4ade80",
-    bank: "#60a5fa",
-    card: "#a78bfa"
-  };
-  const years = [currentYear - 1, currentYear, currentYear + 1];
-  const openMark = (s, existing) => {
+
+  const openMark = (student, existing) => {
     setForm(existing ? {
       ...existing,
       amount: String(existing.amount)
     } : {
-      student_id: s.id,
-      student_name: s.name,
+      student_id: student.id,
+      student_name: student.name,
       month: selMonth,
       year: selYear,
       amount: "",
@@ -2344,323 +2373,66 @@ const PaymentsPage = ({
     setModal(existing || "add");
   };
 
-  // Payments recorded for the selected month/year
-  const monthPayments = payments.filter(p => p.month === selMonth && p.year === selYear);
+  const filtered = payments.filter(p =>
+    !filterStudent || p.student_id === filterStudent
+  );
+
+  const totalCollected = payments.reduce(
+    (sum, p) => sum + Number(p.amount || 0),
+    0
+  );
+
+  const monthPayments = payments.filter(p =>
+    p.month === selMonth && Number(p.year) === Number(selYear)
+  );
+
   const paidMap = {};
   monthPayments.forEach(p => {
     paidMap[p.student_id] = p;
   });
+
   const unpaidStudents = students.filter(s => !paidMap[s.id]);
   const paidStudents = students.filter(s => paidMap[s.id]);
-  const monthTotal = monthPayments.reduce((s, p) => s + (p.amount || 0), 0);
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+  const monthTotal = monthPayments.reduce(
+    (sum, p) => sum + Number(p.amount || 0),
+    0
+  );
+
+  const historyGroups = {};
+  filtered.forEach(p => {
+    const key = `${p.month}-${p.year}`;
+    if (!historyGroups[key]) {
+      historyGroups[key] = {
+        month: p.month,
+        year: Number(p.year),
+        payments: [],
+        total: 0
+      };
+    }
+    historyGroups[key].payments.push(p);
+    historyGroups[key].total += Number(p.amount || 0);
+  });
+
+  const historySections = Object.values(historyGroups).sort((a, b) => {
+    if (b.year !== a.year) return b.year - a.year;
+    return MONTHS.indexOf(b.month) - MONTHS.indexOf(a.month);
+  });
+
+  const paymentActions = p => role === "admin" ? h("div", {
     style: {
       display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: 18,
-      flexWrap: "wrap",
-      gap: 10
+      gap: 6,
+      alignItems: "center"
     }
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
-    style: {
-      fontSize: 26,
-      fontFamily: "'Cormorant Garamond',serif",
-      color: T.text,
-      margin: "0 0 3px",
-      fontWeight: 800
-    }
-  }, "Payments"), /*#__PURE__*/React.createElement("p", {
-    style: {
-      color: T.text3,
-      fontSize: 13,
-      margin: 0
-    }
-  }, "Monthly fee tracker")), role === "admin" && /*#__PURE__*/React.createElement(Btn, {
-    onClick: () => {
-      setForm({
-        student_id: "",
-        student_name: "",
-        month: selMonth,
-        year: selYear,
-        amount: "",
-        method: "cash",
-        notes: ""
-      });
-      setModal("add");
-    },
-    icon: "plus",
-    th: th
-  }, "Record Payment")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8,
-      marginBottom: 14
-    }
-  }, /*#__PURE__*/React.createElement("select", {
-    value: selMonth,
-    onChange: e => setSelMonth(e.target.value),
-    style: {
-      flex: 1,
-      padding: "10px 12px",
-      background: T.input,
-      border: `1px solid ${T.inputBorder}`,
-      borderRadius: 11,
-      color: T.text,
-      fontSize: 13,
-      outline: "none",
-      WebkitAppearance: "none"
-    }
-  }, MONTHS.map(m => /*#__PURE__*/React.createElement("option", {
-    key: m,
-    value: m,
-    style: {
-      background: T.bg2
-    }
-  }, m))), /*#__PURE__*/React.createElement("select", {
-    value: String(selYear),
-    onChange: e => setSelYear(Number(e.target.value)),
-    style: {
-      width: 100,
-      padding: "10px 12px",
-      background: T.input,
-      border: `1px solid ${T.inputBorder}`,
-      borderRadius: 11,
-      color: T.text,
-      fontSize: 13,
-      outline: "none",
-      WebkitAppearance: "none"
-    }
-  }, years.map(y => /*#__PURE__*/React.createElement("option", {
-    key: y,
-    value: y,
-    style: {
-      background: T.bg2
-    }
-  }, y)))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr 1fr",
-      gap: 10,
-      marginBottom: 14
-    }
-  }, /*#__PURE__*/React.createElement(Stat, {
-    icon: "credit",
-    label: "Collected",
-    value: `€${monthTotal}`,
-    color: "#4ade80",
-    th: th
-  }), /*#__PURE__*/React.createElement(Stat, {
-    icon: "check",
-    label: "Paid",
-    value: paidStudents.length,
-    color: "#4ade80",
-    th: th
-  }), /*#__PURE__*/React.createElement(Stat, {
-    icon: "users",
-    label: "Unpaid",
-    value: unpaidStudents.length,
-    color: "#f87171",
-    th: th
-  })), /*#__PURE__*/React.createElement(Crd, {
-    th: th,
-    style: {
-      padding: "14px 16px",
-      marginBottom: 14
-    }
-  }, /*#__PURE__*/React.createElement(SH, {
-    title: `Unpaid — ${selMonth} ${selYear} (${unpaidStudents.length})`,
-    color: "#f87171",
-    th: th
-  }), loading ? /*#__PURE__*/React.createElement(Spinner, {
-    th: th
-  }) : unpaidStudents.length === 0 ? /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "12px 0",
-      color: T.text3,
-      fontSize: 13
-    }
-  }, "Everyone has paid for this month.") : unpaidStudents.map(s => /*#__PURE__*/React.createElement(Row, {
-    key: s.id,
-    th: th,
-    left: /*#__PURE__*/React.createElement(Av, {
-      name: s.name,
-      color: "#f87171"
-    }),
-    title: s.name,
-    sub: s.instrument || "",
-    right: role === "admin" ? /*#__PURE__*/React.createElement(Btn, {
-      onClick: () => openMark(s),
-      color: "#4ade80",
-      icon: "check",
-      style: {
-        padding: "7px 12px",
-        fontSize: 12
-      },
-      th: th
-    }, "Mark as paid") : /*#__PURE__*/React.createElement(Bdg, {
-      text: "Unpaid",
-      color: "#f87171"
-    })
-  }))), /*#__PURE__*/React.createElement(Crd, {
-    th: th,
-    style: {
-      padding: "14px 16px",
-      marginBottom: 14
-    }
-  }, /*#__PURE__*/React.createElement(SH, {
-    title: `Paid — ${selMonth} ${selYear} (${paidStudents.length})`,
-    color: "#4ade80",
-    th: th
-  }), loading ? /*#__PURE__*/React.createElement(Spinner, {
-    th: th
-  }) : paidStudents.length === 0 ? /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "12px 0",
-      color: T.text3,
-      fontSize: 13
-    }
-  }, "No payments recorded yet for this month.") : paidStudents.map(s => {
-    const p = paidMap[s.id];
-    return /*#__PURE__*/React.createElement(Row, {
-      key: s.id,
-      th: th,
-      left: /*#__PURE__*/React.createElement(Av, {
-        name: s.name,
-        color: "#4ade80"
-      }),
-      title: s.name,
-      sub: `€${p.amount} · ${p.method || "cash"}`,
-      right: /*#__PURE__*/React.createElement("div", {
-        style: {
-          display: "flex",
-          gap: 6,
-          alignItems: "center"
-        }
-      }, /*#__PURE__*/React.createElement(Bdg, {
-        text: "Paid",
-        color: "#4ade80"
-      }), role === "admin" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
-        onClick: () => openMark(s, p),
-        style: {
-          width: 28,
-          height: 28,
-          borderRadius: 7,
-          background: "rgba(96,165,250,0.15)",
-          border: "none",
-          cursor: "pointer",
-          color: "#60a5fa",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }
-      }, /*#__PURE__*/React.createElement(Ic, {
-        n: "edit",
-        s: 12
-      })), /*#__PURE__*/React.createElement("button", {
-        onClick: () => del(p),
-        style: {
-          width: 28,
-          height: 28,
-          borderRadius: 7,
-          background: "rgba(248,113,113,0.15)",
-          border: "none",
-          cursor: "pointer",
-          color: "#f87171",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }
-      }, /*#__PURE__*/React.createElement(Ic, {
-        n: "trash",
-        s: 12
-      }))))
-    });
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8,
-      marginBottom: 14
-    }
-  }, /*#__PURE__*/React.createElement("select", {
-    value: filterStudent,
-    onChange: e => setFilterStudent(e.target.value),
-    style: {
-      flex: 1,
-      padding: "10px 12px",
-      background: T.input,
-      border: `1px solid ${T.inputBorder}`,
-      borderRadius: 11,
-      color: T.text,
-      fontSize: 13,
-      outline: "none",
-      WebkitAppearance: "none"
-    }
-  }, /*#__PURE__*/React.createElement("option", {
-    value: "",
-    style: {
-      background: T.bg2
-    }
-  }, "All Students"), students.map(s => /*#__PURE__*/React.createElement("option", {
-    key: s.id,
-    value: s.id,
-    style: {
-      background: T.bg2
-    }
-  }, s.name)))), /*#__PURE__*/React.createElement(Crd, {
-    th: th,
-    style: {
-      padding: 16
-    }
-  }, /*#__PURE__*/React.createElement(SH, {
-    title: "Payment History",
-    color: T.gold,
-    th: th
-  }), loading ? /*#__PURE__*/React.createElement(Spinner, {
-    th: th
-  }) : filtered.length === 0 ? /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: 24,
-      textAlign: "center",
-      color: T.text3
-    }
-  }, "No payments recorded yet.") : filtered.map(p => /*#__PURE__*/React.createElement(Row, {
-    key: p.id,
-    th: th,
-    left: /*#__PURE__*/React.createElement("div", {
-      style: {
-        width: 44,
-        height: 44,
-        borderRadius: 12,
-        background: `${methodColor[p.method] || "#C9A84C"}18`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        color: methodColor[p.method] || "#C9A84C",
-        flexShrink: 0
-      }
-    }, /*#__PURE__*/React.createElement(Ic, {
-      n: "credit",
-      s: 20
-    })),
-    title: p.student_name || "Unknown",
-    sub: `${p.month} ${p.year} · ${p.method || "cash"}${p.notes ? ` · ${p.notes}` : ""}`,
-    right: /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        gap: 6,
-        alignItems: "center"
-      }
-    }, /*#__PURE__*/React.createElement("span", {
+  },
+    h("span", {
       style: {
         fontSize: 16,
         fontWeight: 800,
         color: "#4ade80"
       }
-    }, "\u20AC", p.amount), /*#__PURE__*/React.createElement(Bdg, {
-      text: p.method || "cash",
-      color: methodColor[p.method] || "#C9A84C"
-    }), role === "admin" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+    }, money(p.amount)),
+    h("button", {
       onClick: () => {
         setForm({
           ...p,
@@ -2680,10 +2452,8 @@ const PaymentsPage = ({
         alignItems: "center",
         justifyContent: "center"
       }
-    }, /*#__PURE__*/React.createElement(Ic, {
-      n: "edit",
-      s: 12
-    })), /*#__PURE__*/React.createElement("button", {
+    }, h(Ic, { n: "edit", s: 12 })),
+    h("button", {
       onClick: () => del(p),
       style: {
         width: 28,
@@ -2697,106 +2467,490 @@ const PaymentsPage = ({
         alignItems: "center",
         justifyContent: "center"
       }
-    }, /*#__PURE__*/React.createElement(Ic, {
-      n: "trash",
-      s: 12
-    }))))
-  }))), modal && /*#__PURE__*/React.createElement(Modal, {
-    title: modal === "add" ? "Record Payment" : "Edit Payment",
-    onClose: () => setModal(null),
-    accent: "#4ade80",
+    }, h(Ic, { n: "trash", s: 12 }))
+  ) : h("span", {
+    style: {
+      fontSize: 16,
+      fontWeight: 800,
+      color: "#4ade80"
+    }
+  }, money(p.amount));
+
+  const renderHistoryRow = p => h(Row, {
+    key: p.id,
     th: th,
-    fixedBtn: true
-  }, /*#__PURE__*/React.createElement(Field, {
-    label: "Student",
-    value: form.student_id,
-    onChange: v => setForm(f => ({
-      ...f,
-      student_id: v
-    })),
-    options: students.map(s => ({
-      value: s.id,
-      label: s.name
-    })),
-    required: true,
-    th: th
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: "0 12px"
-    }
-  }, /*#__PURE__*/React.createElement(Field, {
-    label: "Month",
-    value: form.month,
-    onChange: v => setForm(f => ({
-      ...f,
-      month: v
-    })),
-    options: MONTHS,
-    required: true,
-    th: th
-  }), /*#__PURE__*/React.createElement(Field, {
-    label: "Year",
-    value: String(form.year),
-    onChange: v => setForm(f => ({
-      ...f,
-      year: Number(v)
-    })),
-    options: years.map(String),
-    th: th
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: "0 12px"
-    }
-  }, /*#__PURE__*/React.createElement(Field, {
-    label: "Amount (\u20AC)",
-    value: form.amount,
-    onChange: v => setForm(f => ({
-      ...f,
-      amount: v
-    })),
-    type: "number",
-    required: true,
-    th: th
-  }), /*#__PURE__*/React.createElement(Field, {
-    label: "Method",
-    value: form.method,
-    onChange: v => setForm(f => ({
-      ...f,
-      method: v
-    })),
-    options: ["cash", "bank", "card"],
-    th: th
-  })), /*#__PURE__*/React.createElement(Field, {
-    label: "Notes",
-    value: form.notes,
-    onChange: v => setForm(f => ({
-      ...f,
-      notes: v
-    })),
-    type: "textarea",
-    th: th
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 10,
-      justifyContent: "flex-end"
-    }
-  }, /*#__PURE__*/React.createElement(Btn, {
-    onClick: () => setModal(null),
-    outline: true,
-    color: T.text2,
-    th: th
-  }, "Cancel"), /*#__PURE__*/React.createElement(Btn, {
-    onClick: save,
-    disabled: saving,
-    icon: "save",
-    color: "#4ade80",
-    th: th
-  }, saving ? "Saving…" : "Save Payment"))));
+    left: h("div", {
+      style: {
+        width: 40,
+        height: 40,
+        borderRadius: 11,
+        background: `${methodColor[p.method] || "#C9A84C"}18`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: methodColor[p.method] || "#C9A84C",
+        flexShrink: 0
+      }
+    }, h(Ic, { n: "credit", s: 18 })),
+    title: p.student_name || "Unknown",
+    sub: `${p.method || "cash"}${p.notes ? ` · ${p.notes}` : ""}`,
+    right: paymentActions(p)
+  });
+
+  const visibleStudents = paymentView === "unpaid" ? unpaidStudents : paidStudents;
+
+  return h("div", null,
+
+    h("div", {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 18,
+        flexWrap: "wrap",
+        gap: 10
+      }
+    },
+      h("div", null,
+        h("h1", {
+          style: {
+            fontSize: 26,
+            fontFamily: "'Cormorant Garamond',serif",
+            color: T.text,
+            margin: "0 0 3px",
+            fontWeight: 800
+          }
+        }, "Payments"),
+        h("p", {
+          style: {
+            color: T.text3,
+            fontSize: 13,
+            margin: 0
+          }
+        }, "Monthly fee tracker")
+      ),
+      role === "admin" && h(Btn, {
+        onClick: () => {
+          setForm({
+            student_id: "",
+            student_name: "",
+            month: selMonth,
+            year: selYear,
+            amount: "",
+            method: "cash",
+            notes: ""
+          });
+          setModal("add");
+        },
+        icon: "plus",
+        th: th
+      }, "Record Payment")
+    ),
+
+    h(Crd, {
+      th: th,
+      style: {
+        padding: "15px 18px",
+        marginBottom: 14,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 12
+      }
+    },
+      h("div", null,
+        h("div", {
+          style: {
+            color: T.text3,
+            fontSize: 11,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            marginBottom: 3
+          }
+        }, "Total Collected"),
+        h("div", {
+          style: {
+            color: T.text,
+            fontSize: 13
+          }
+        }, `${payments.length} payments`)
+      ),
+      h("div", {
+        style: {
+          fontSize: 26,
+          fontWeight: 800,
+          color: "#4ade80"
+        }
+      }, money(totalCollected))
+    ),
+
+    h("div", {
+      style: {
+        display: "flex",
+        gap: 8,
+        marginBottom: 14
+      }
+    },
+      h("select", {
+        value: selMonth,
+        onChange: e => setSelMonth(e.target.value),
+        style: {
+          flex: 1,
+          padding: "10px 12px",
+          background: T.input,
+          border: `1px solid ${T.inputBorder}`,
+          borderRadius: 11,
+          color: T.text,
+          fontSize: 13,
+          outline: "none",
+          WebkitAppearance: "none"
+        }
+      }, MONTHS.map(m => h("option", {
+        key: m,
+        value: m,
+        style: { background: T.bg2 }
+      }, m))),
+      h("select", {
+        value: String(selYear),
+        onChange: e => setSelYear(Number(e.target.value)),
+        style: {
+          width: 100,
+          padding: "10px 12px",
+          background: T.input,
+          border: `1px solid ${T.inputBorder}`,
+          borderRadius: 11,
+          color: T.text,
+          fontSize: 13,
+          outline: "none",
+          WebkitAppearance: "none"
+        }
+      }, years.map(y => h("option", {
+        key: y,
+        value: y,
+        style: { background: T.bg2 }
+      }, y)))
+    ),
+
+    h("div", {
+      style: {
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr 1fr",
+        gap: 10,
+        marginBottom: 14
+      }
+    },
+      h(Stat, {
+        icon: "credit",
+        label: "This Month",
+        value: money(monthTotal),
+        color: "#4ade80",
+        th: th
+      }),
+      h(Stat, {
+        icon: "check",
+        label: "Paid",
+        value: paidStudents.length,
+        color: "#4ade80",
+        th: th
+      }),
+      h(Stat, {
+        icon: "users",
+        label: "Unpaid",
+        value: unpaidStudents.length,
+        color: "#f87171",
+        th: th
+      })
+    ),
+
+    h("div", {
+      style: {
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 8,
+        marginBottom: 10
+      }
+    },
+      h("button", {
+        onClick: () => setPaymentView("unpaid"),
+        style: {
+          padding: "10px 12px",
+          borderRadius: 10,
+          cursor: "pointer",
+          fontWeight: 700,
+          border: paymentView === "unpaid" ? "1px solid rgba(248,113,113,0.45)" : `1px solid ${T.border}`,
+          background: paymentView === "unpaid" ? "rgba(248,113,113,0.12)" : T.input,
+          color: paymentView === "unpaid" ? "#f87171" : T.text2
+        }
+      }, `Unpaid (${unpaidStudents.length})`),
+      h("button", {
+        onClick: () => setPaymentView("paid"),
+        style: {
+          padding: "10px 12px",
+          borderRadius: 10,
+          cursor: "pointer",
+          fontWeight: 700,
+          border: paymentView === "paid" ? "1px solid rgba(74,222,128,0.45)" : `1px solid ${T.border}`,
+          background: paymentView === "paid" ? "rgba(74,222,128,0.12)" : T.input,
+          color: paymentView === "paid" ? "#4ade80" : T.text2
+        }
+      }, `Paid (${paidStudents.length})`)
+    ),
+
+    h(Crd, {
+      th: th,
+      style: {
+        padding: "14px 16px",
+        marginBottom: 14
+      }
+    },
+      h(SH, {
+        title: `${paymentView === "unpaid" ? "Unpaid" : "Paid"} — ${selMonth} ${selYear}`,
+        color: paymentView === "unpaid" ? "#f87171" : "#4ade80",
+        th: th
+      }),
+      loading ? h(Spinner, { th: th }) :
+      visibleStudents.length === 0 ? h("div", {
+        style: {
+          padding: "14px 0",
+          color: T.text3,
+          fontSize: 13
+        }
+      }, paymentView === "unpaid" ? "Everyone has paid for this month." : "No payments recorded yet for this month.") :
+      visibleStudents.map(s => {
+        const p = paidMap[s.id];
+        return h(Row, {
+          key: s.id,
+          th: th,
+          left: h(Av, {
+            name: s.name,
+            color: paymentView === "unpaid" ? "#f87171" : "#4ade80"
+          }),
+          title: s.name,
+          sub: paymentView === "unpaid"
+            ? (s.instrument || "")
+            : `${money(p.amount)} · ${p.method || "cash"}`,
+          right: paymentView === "unpaid"
+            ? (role === "admin" ? h(Btn, {
+                onClick: () => openMark(s),
+                color: "#4ade80",
+                icon: "check",
+                style: {
+                  padding: "7px 12px",
+                  fontSize: 12
+                },
+                th: th
+              }, "Mark as paid") : h(Bdg, {
+                text: "Unpaid",
+                color: "#f87171"
+              }))
+            : h(Bdg, {
+                text: "Paid",
+                color: "#4ade80"
+              })
+        });
+      })
+    ),
+
+    h("div", {
+      style: {
+        margin: "22px 0 12px",
+        borderTop: `1px solid ${T.border}`,
+        paddingTop: 18
+      }
+    },
+      h("div", {
+        style: {
+          fontSize: 18,
+          fontWeight: 800,
+          color: T.text,
+          fontFamily: "'Cormorant Garamond',serif",
+          marginBottom: 10
+        }
+      }, "Payment History"),
+      h("select", {
+        value: filterStudent,
+        onChange: e => setFilterStudent(e.target.value),
+        style: {
+          width: "100%",
+          padding: "10px 12px",
+          background: T.input,
+          border: `1px solid ${T.inputBorder}`,
+          borderRadius: 11,
+          color: T.text,
+          fontSize: 13,
+          outline: "none",
+          WebkitAppearance: "none",
+          marginBottom: 12
+        }
+      },
+        h("option", {
+          value: "",
+          style: { background: T.bg2 }
+        }, "All Students"),
+        students.map(s => h("option", {
+          key: s.id,
+          value: s.id,
+          style: { background: T.bg2 }
+        }, s.name))
+      )
+    ),
+
+    loading ? h(Spinner, { th: th }) :
+    historySections.length === 0 ? h(Crd, {
+      th: th,
+      style: {
+        padding: 22,
+        textAlign: "center",
+        color: T.text3
+      }
+    }, "No payments recorded yet.") :
+    historySections.map(group => h(Crd, {
+      key: `${group.month}-${group.year}`,
+      th: th,
+      style: {
+        padding: "14px 16px",
+        marginBottom: 10
+      }
+    },
+      h("div", {
+        style: {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 10,
+          marginBottom: 6
+        }
+      },
+        h("div", {
+          style: {
+            fontSize: 15,
+            fontWeight: 800,
+            color: T.text
+          }
+        }, `${group.month} ${group.year}`),
+        h("div", {
+          style: {
+            fontSize: 14,
+            fontWeight: 800,
+            color: "#4ade80"
+          }
+        }, money(group.total))
+      ),
+      group.payments.map(renderHistoryRow)
+    )),
+
+    modal && h(Modal, {
+      title: modal === "add" ? "Record Payment" : "Edit Payment",
+      onClose: () => setModal(null),
+      accent: "#4ade80",
+      th: th,
+      fixedBtn: true
+    },
+      h(Field, {
+        label: "Student",
+        value: form.student_id,
+        onChange: v => setForm(f => ({
+          ...f,
+          student_id: v
+        })),
+        options: students.map(s => ({
+          value: s.id,
+          label: s.name
+        })),
+        required: true,
+        th: th
+      }),
+      h("div", {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "0 12px"
+        }
+      },
+        h(Field, {
+          label: "Month",
+          value: form.month,
+          onChange: v => setForm(f => ({
+            ...f,
+            month: v
+          })),
+          options: MONTHS,
+          required: true,
+          th: th
+        }),
+        h(Field, {
+          label: "Year",
+          value: String(form.year),
+          onChange: v => setForm(f => ({
+            ...f,
+            year: Number(v)
+          })),
+          options: years.map(String),
+          th: th
+        })
+      ),
+      h("div", {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "0 12px"
+        }
+      },
+        h(Field, {
+          label: "Amount (€)",
+          value: form.amount,
+          onChange: v => setForm(f => ({
+            ...f,
+            amount: v
+          })),
+          type: "number",
+          required: true,
+          th: th
+        }),
+        h(Field, {
+          label: "Method",
+          value: form.method,
+          onChange: v => setForm(f => ({
+            ...f,
+            method: v
+          })),
+          options: ["cash", "bank", "card"],
+          th: th
+        })
+      ),
+      h(Field, {
+        label: "Notes",
+        value: form.notes,
+        onChange: v => setForm(f => ({
+          ...f,
+          notes: v
+        })),
+        type: "textarea",
+        th: th
+      }),
+      h("div", {
+        style: {
+          display: "flex",
+          gap: 10,
+          justifyContent: "flex-end"
+        }
+      },
+        h(Btn, {
+          onClick: () => setModal(null),
+          outline: true,
+          color: T.text2,
+          th: th
+        }, "Cancel"),
+        h(Btn, {
+          onClick: save,
+          disabled: saving,
+          icon: "save",
+          color: "#4ade80",
+          th: th
+        }, saving ? "Saving…" : "Save Payment")
+      )
+    )
+  );
 };
 
 
