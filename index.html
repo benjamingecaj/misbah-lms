@@ -51,12 +51,14 @@
 </head>
 <body>
 <div id="login" class="login">
-  <div class="login-card">
-    <h1>Misbah & Friends</h1><p>School administration panel</p>
+  <form class="login-card" id="loginForm">
+    <h1>Misbah & Friends</h1><p>School administration panel <span style="opacity:.45">· v4</span></p>
     <div class="field"><label>Email</label><input id="loginEmail" type="email" autocomplete="username"></div>
     <div class="field"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password"></div>
-    <button class="btn gold" id="loginBtn">Sign in</button><div class="login-error" id="loginError"></div>
-  </div>
+    <button class="btn gold" id="loginBtn" type="submit">Sign in</button>
+    <div class="login-error" id="loginError"></div>
+    <div id="loginStatus" style="font-size:11px;color:#7b8089;margin-top:4px;min-height:16px"></div>
+  </form>
 </div>
 <div id="app" class="shell hidden">
   <aside class="sidebar">
@@ -209,70 +211,106 @@ function eventModal(id=null){
 }
 async function deleteRow(table,id,label){if(!confirm(`Delete ${label}?`))return;try{await db.remove(table,id);toast("Deleted");await loadAll();render()}catch(e){toast(e.message,"error")}}
 
-async function startApp(user,profile){
+async function startApp(user){
   state.user=user;
-  state.profile=profile||{full_name:user?.email||"Admin",role:"admin",email:user?.email||""};
-  $("#userMini").innerHTML=`<b>${esc(state.profile.full_name||user.email||"Admin")}</b><br>${esc(user.email||"")}`;
+  state.profile={full_name:user?.email||"Admin",role:"admin",email:user?.email||""};
+
+  $("#userMini").innerHTML=`<b>${esc(user?.email||"Admin")}</b>`;
   $("#login").classList.add("hidden");
   $("#app").classList.remove("hidden");
+
+  // Open the admin immediately. Database loading happens after the UI is visible.
   render();
-  await loadAll();
-  render();
+
+  try{
+    await loadAll();
+    render();
+  }catch(e){
+    console.error("Data load error",e);
+    toast("Signed in, but some data could not load.","error");
+  }
 }
+
 async function restoreSession(){
-  if(!state.token)return;
+  if(!state.token) return;
   try{
     const user=await getUser(state.token);
-    let profile=null;
-    try{
-      const profiles=await db.select("profiles",`?user_id=eq.${user.id}`);
-      profile=profiles?.[0]||null;
-    }catch(e){
-      console.warn("Profile lookup failed",e);
-    }
-    await startApp(user,profile);
+    await startApp(user);
   }catch(e){
+    console.warn("Saved session invalid",e);
     localStorage.removeItem("misbah_admin_token");
     state.token="";
   }
 }
-$("#loginBtn").onclick=async()=>{
+
+async function loginNow(){
   const btn=$("#loginBtn");
+  const status=$("#loginStatus");
+  const error=$("#loginError");
   const email=$("#loginEmail").value.trim();
   const password=$("#loginPassword").value;
-  $("#loginError").textContent="";
-  if(!email||!password){
-    $("#loginError").textContent="Please enter email and password.";
+
+  error.textContent="";
+  status.textContent="";
+
+  if(!email || !password){
+    error.textContent="Please enter email and password.";
     return;
   }
+
   btn.disabled=true;
   btn.textContent="Signing in...";
+  status.textContent="Connecting to the school database...";
+
   try{
     const d=await signIn(email,password);
+
+    if(!d || !d.access_token || !d.user){
+      throw new Error("Login response was incomplete.");
+    }
+
     state.token=d.access_token;
     localStorage.setItem("misbah_admin_token",state.token);
 
-    let profile=null;
-    try{
-      const profiles=await db.select("profiles",`?user_id=eq.${d.user.id}`);
-      profile=profiles?.[0]||null;
-    }catch(e){
-      console.warn("Profile lookup failed",e);
-    }
-
-    await startApp(d.user,profile);
+    status.textContent="Login successful. Opening admin...";
+    await startApp(d.user);
   }catch(e){
-    console.error(e);
-    $("#loginError").textContent=e.message||"Login failed";
+    console.error("Login failed",e);
+    error.textContent=e?.message || "Login failed.";
+    status.textContent="";
     localStorage.removeItem("misbah_admin_token");
     state.token="";
   }finally{
     btn.disabled=false;
     btn.textContent="Sign in";
   }
+}
+
+$("#loginForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  loginNow();
+});
+
+$("#logoutBtn").onclick=()=>{
+  localStorage.removeItem("misbah_admin_token");
+  state.token="";
+  location.reload();
 };
-$("#loginPassword").addEventListener("keydown",e=>{if(e.key==="Enter")$("#loginBtn").click()});
-$("#logoutBtn").onclick=()=>{localStorage.removeItem("misbah_admin_token");location.reload()};
+
+// If a browser/runtime error happens before login, show it instead of silently staying stuck.
+window.addEventListener("error",e=>{
+  const box=document.querySelector("#loginError");
+  if(box && !document.querySelector("#login")?.classList.contains("hidden")){
+    box.textContent="Page error: "+(e.message||"Unknown error");
+  }
+});
+window.addEventListener("unhandledrejection",e=>{
+  const box=document.querySelector("#loginError");
+  if(box && !document.querySelector("#login")?.classList.contains("hidden")){
+    box.textContent="Connection error: "+(e.reason?.message||String(e.reason||"Unknown error"));
+  }
+});
+
 restoreSession();
 </script>
 </body>
