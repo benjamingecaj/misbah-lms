@@ -1155,58 +1155,54 @@ const Modal = ({
   th
 }) => {
   const T = th || DARK;
+  const { isMobile } = useMedia();
   return /*#__PURE__*/React.createElement("div", {
     style: {
       position: "fixed",
       inset: 0,
-      background: "rgba(0,0,0,0.72)",
-      backdropFilter: "blur(12px)",
+      background: "rgba(0,0,0,0.62)",
+      backdropFilter: "blur(9px)",
       zIndex: 2000,
       display: "flex",
-      alignItems: "flex-end",
-      justifyContent: "center"
+      alignItems: "center",
+      justifyContent: "center",
+      padding: isMobile ? 10 : 24
     },
     onClick: e => e.target === e.currentTarget && onClose()
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       background: T.bg2,
-      border: `1px solid ${accent}28`,
-      borderRadius: "22px 22px 0 0",
+      border: `1px solid ${accent}24`,
+      borderRadius: isMobile ? 18 : 24,
       width: "100%",
-      maxWidth: 640,
-      maxHeight: "92vh",
+      maxWidth: isMobile ? "100%" : 640,
+      maxHeight: isMobile ? "calc(100dvh - 20px)" : "88vh",
       display: "flex",
       flexDirection: "column",
-      animation: "slideUp 0.28s ease"
+      overflow: "hidden",
+      boxShadow: "0 24px 80px rgba(0,0,0,0.28)",
+      animation: "slideUp 0.22s ease"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       position: "sticky",
       top: 0,
       background: T.bg2,
-      padding: "12px 20px 0",
+      padding: isMobile ? "14px 14px 0" : "16px 20px 0",
       zIndex: 1,
       flexShrink: 0
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      width: 38,
-      height: 4,
-      background: T.border,
-      borderRadius: 2,
-      margin: "0 auto 14px"
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      paddingBottom: 12,
+      paddingBottom: isMobile ? 11 : 13,
       borderBottom: `1px solid ${T.border}`
     }
   }, /*#__PURE__*/React.createElement("h2", {
     style: {
-      fontSize: 19,
+      fontSize: isMobile ? 18 : 20,
       fontFamily: "'Cormorant Garamond',serif",
       color: accent,
       margin: 0,
@@ -1216,7 +1212,7 @@ const Modal = ({
     onClick: onClose,
     style: {
       background: T.input,
-      border: "none",
+      border: `1px solid ${T.inputBorder}`,
       borderRadius: 10,
       width: 34,
       height: 34,
@@ -1224,7 +1220,8 @@ const Modal = ({
       color: T.text2,
       display: "flex",
       alignItems: "center",
-      justifyContent: "center"
+      justifyContent: "center",
+      flexShrink: 0
     }
   }, /*#__PURE__*/React.createElement(Ic, {
     n: "x",
@@ -1233,13 +1230,12 @@ const Modal = ({
     style: {
       flex: 1,
       overflowY: "auto",
-      padding: "16px 20px",
+      padding: isMobile ? "14px" : "18px 20px",
       WebkitOverflowScrolling: "touch"
     }
   }, children), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "12px 20px",
-      paddingBottom: "calc(12px + env(safe-area-inset-bottom,0))",
       borderTop: `1px solid ${T.border}`,
       background: T.bg2,
       flexShrink: 0,
@@ -1558,7 +1554,7 @@ const Login = ({
       textAlign: "center",
       marginTop: 14
     }
-  }, "Sign in with your school-issued credentials. · Build 5"))));
+  }, "Sign in with your school-issued credentials. · Build 6 Responsive"))));
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -2250,6 +2246,7 @@ const PaymentsPage = ({
   th
 }) => {
   const T = th || DARK;
+  const { isMobile } = useMedia();
   const [payments, setPayments] = useState([]);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -2723,7 +2720,7 @@ const PaymentsPage = ({
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
-      gridTemplateColumns: "1fr 1fr",
+      gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
       gap: "0 12px"
     }
   }, /*#__PURE__*/React.createElement(Field, {
@@ -2748,7 +2745,7 @@ const PaymentsPage = ({
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
-      gridTemplateColumns: "1fr 1fr",
+      gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
       gap: "0 12px"
     }
   }, /*#__PURE__*/React.createElement(Field, {
@@ -2783,7 +2780,8 @@ const PaymentsPage = ({
     style: {
       display: "flex",
       gap: 10,
-      justifyContent: "flex-end"
+      justifyContent: "flex-end",
+      flexWrap: "wrap"
     }
   }, /*#__PURE__*/React.createElement(Btn, {
     onClick: () => setModal(null),
