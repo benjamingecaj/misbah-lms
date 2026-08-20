@@ -2251,20 +2251,23 @@ const PaymentsPage = ({
 }) => {
   const h = React.createElement;
   const T = th || DARK;
+
   const [payments, setPayments] = useState([]);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [filterStudent, setFilterStudent] = useState("");
-  const currentYear = new Date().getFullYear();
-  const [selMonth, setSelMonth] = useState(MONTHS[new Date().getMonth()]);
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const [selMonth, setSelMonth] = useState(MONTHS[now.getMonth()]);
   const [selYear, setSelYear] = useState(currentYear);
-  const [paymentView, setPaymentView] = useState("unpaid");
+  const [view, setView] = useState("unpaid");
+
   const [form, setForm] = useState({
     student_id: "",
     student_name: "",
-    month: "",
+    month: MONTHS[now.getMonth()],
     year: currentYear,
     amount: "",
     method: "cash",
@@ -2272,12 +2275,8 @@ const PaymentsPage = ({
   });
 
   const years = [currentYear - 1, currentYear, currentYear + 1];
-  const methodColor = {
-    cash: "#4ade80",
-    bank: "#60a5fa",
-    card: "#a78bfa"
-  };
-  const money = n => `€${Number(n || 0).toLocaleString("en-GB", {
+
+  const money = value => `€${Number(value || 0).toLocaleString("en-GB", {
     maximumFractionDigits: 2
   })}`;
 
@@ -2288,8 +2287,8 @@ const PaymentsPage = ({
         sb.select("payments", "?order=year.desc,month"),
         sb.select("students", "?order=name")
       ]);
-      setPayments(p);
-      setStudents(s);
+      setPayments(p || []);
+      setStudents(s || []);
     } catch (e) {
       toast(e.message, "error");
     } finally {
@@ -2301,30 +2300,52 @@ const PaymentsPage = ({
     load();
   }, []);
 
+  const openNewPayment = student => {
+    setForm({
+      student_id: student?.id || "",
+      student_name: student?.name || "",
+      month: selMonth,
+      year: selYear,
+      amount: "",
+      method: "cash",
+      notes: ""
+    });
+    setModal("add");
+  };
+
+  const openEditPayment = payment => {
+    setForm({
+      ...payment,
+      amount: String(payment.amount ?? ""),
+      year: Number(payment.year)
+    });
+    setModal(payment);
+  };
+
   const save = async () => {
     if (!form.student_id || !form.month || !form.amount) {
       toast("Student, month and amount required", "error");
       return;
     }
 
-    if (modal === "add") {
-      const alreadyPaid = payments.some(p =>
-        p.student_id === form.student_id &&
-        p.month === form.month &&
-        Number(p.year) === Number(form.year)
-      );
-      if (alreadyPaid) {
-        toast("This student is already marked as paid for this month.", "error");
-        return;
-      }
+    const duplicate = payments.find(p =>
+      p.student_id === form.student_id &&
+      p.month === form.month &&
+      Number(p.year) === Number(form.year) &&
+      (modal === "add" || p.id !== modal.id)
+    );
+
+    if (duplicate) {
+      toast("This student already has a payment for this month.", "error");
+      return;
     }
 
     setSaving(true);
     try {
-      const s = students.find(x => x.id === form.student_id);
+      const student = students.find(s => s.id === form.student_id);
       const payload = {
         ...form,
-        student_name: s?.name || "",
+        student_name: student?.name || form.student_name || "",
         amount: Number(form.amount),
         year: Number(form.year)
       };
@@ -2334,7 +2355,7 @@ const PaymentsPage = ({
         toast("Payment recorded!");
       } else {
         await sb.update("payments", modal.id, payload);
-        toast("Updated!");
+        toast("Payment updated!");
       }
 
       setModal(null);
@@ -2346,36 +2367,16 @@ const PaymentsPage = ({
     }
   };
 
-  const del = async p => {
-    if (!confirm(`Delete payment for ${p.student_name}?`)) return;
+  const del = async payment => {
+    if (!confirm(`Delete payment for ${payment.student_name}?`)) return;
     try {
-      await sb.remove("payments", p.id);
-      toast("Deleted");
+      await sb.remove("payments", payment.id);
+      toast("Payment deleted");
       await load();
     } catch (e) {
       toast(e.message, "error");
     }
   };
-
-  const openMark = (student, existing) => {
-    setForm(existing ? {
-      ...existing,
-      amount: String(existing.amount)
-    } : {
-      student_id: student.id,
-      student_name: student.name,
-      month: selMonth,
-      year: selYear,
-      amount: "",
-      method: "cash",
-      notes: ""
-    });
-    setModal(existing || "add");
-  };
-
-  const filtered = payments.filter(p =>
-    !filterStudent || p.student_id === filterStudent
-  );
 
   const totalCollected = payments.reduce(
     (sum, p) => sum + Number(p.amount || 0),
@@ -2391,124 +2392,74 @@ const PaymentsPage = ({
     paidMap[p.student_id] = p;
   });
 
-  const unpaidStudents = students.filter(s => !paidMap[s.id]);
   const paidStudents = students.filter(s => paidMap[s.id]);
+  const unpaidStudents = students.filter(s => !paidMap[s.id]);
+
   const monthTotal = monthPayments.reduce(
     (sum, p) => sum + Number(p.amount || 0),
     0
   );
 
-  const historyGroups = {};
-  filtered.forEach(p => {
-    const key = `${p.month}-${p.year}`;
-    if (!historyGroups[key]) {
-      historyGroups[key] = {
-        month: p.month,
+  const shownStudents = view === "unpaid" ? unpaidStudents : paidStudents;
+
+  const history = {};
+  payments.forEach(p => {
+    const key = `${p.year}-${p.month}`;
+    if (!history[key]) {
+      history[key] = {
         year: Number(p.year),
-        payments: [],
-        total: 0
+        month: p.month,
+        total: 0,
+        rows: []
       };
     }
-    historyGroups[key].payments.push(p);
-    historyGroups[key].total += Number(p.amount || 0);
+    history[key].total += Number(p.amount || 0);
+    history[key].rows.push(p);
   });
 
-  const historySections = Object.values(historyGroups).sort((a, b) => {
+  const historyGroups = Object.values(history).sort((a, b) => {
     if (b.year !== a.year) return b.year - a.year;
     return MONTHS.indexOf(b.month) - MONTHS.indexOf(a.month);
   });
 
-  const paymentActions = p => role === "admin" ? h("div", {
+  const compactStat = (label, value, accent) => h("div", {
     style: {
-      display: "flex",
-      gap: 6,
-      alignItems: "center"
+      minWidth: 0,
+      padding: "12px 14px",
+      borderRight: `1px solid ${T.border}`
     }
   },
-    h("span", {
+    h("div", {
       style: {
-        fontSize: 16,
+        fontSize: 10,
+        textTransform: "uppercase",
+        letterSpacing: "0.07em",
+        color: T.text3,
+        marginBottom: 4,
+        fontWeight: 700
+      }
+    }, label),
+    h("div", {
+      style: {
+        fontSize: 18,
         fontWeight: 800,
-        color: "#4ade80"
+        color: accent || T.text,
+        whiteSpace: "nowrap"
       }
-    }, money(p.amount)),
-    h("button", {
-      onClick: () => {
-        setForm({
-          ...p,
-          amount: String(p.amount)
-        });
-        setModal(p);
-      },
-      style: {
-        width: 28,
-        height: 28,
-        borderRadius: 7,
-        background: "rgba(96,165,250,0.15)",
-        border: "none",
-        cursor: "pointer",
-        color: "#60a5fa",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
-      }
-    }, h(Ic, { n: "edit", s: 12 })),
-    h("button", {
-      onClick: () => del(p),
-      style: {
-        width: 28,
-        height: 28,
-        borderRadius: 7,
-        background: "rgba(248,113,113,0.15)",
-        border: "none",
-        cursor: "pointer",
-        color: "#f87171",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
-      }
-    }, h(Ic, { n: "trash", s: 12 }))
-  ) : h("span", {
-    style: {
-      fontSize: 16,
-      fontWeight: 800,
-      color: "#4ade80"
-    }
-  }, money(p.amount));
-
-  const renderHistoryRow = p => h(Row, {
-    key: p.id,
-    th: th,
-    left: h("div", {
-      style: {
-        width: 40,
-        height: 40,
-        borderRadius: 11,
-        background: `${methodColor[p.method] || "#C9A84C"}18`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        color: methodColor[p.method] || "#C9A84C",
-        flexShrink: 0
-      }
-    }, h(Ic, { n: "credit", s: 18 })),
-    title: p.student_name || "Unknown",
-    sub: `${p.method || "cash"}${p.notes ? ` · ${p.notes}` : ""}`,
-    right: paymentActions(p)
-  });
-
-  const visibleStudents = paymentView === "unpaid" ? unpaidStudents : paidStudents;
+    }, value)
+  );
 
   return h("div", null,
 
+    // Header
     h("div", {
       style: {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: 18,
-        flexWrap: "wrap",
-        gap: 10
+        gap: 12,
+        marginBottom: 14,
+        flexWrap: "wrap"
       }
     },
       h("div", null,
@@ -2516,300 +2467,172 @@ const PaymentsPage = ({
           style: {
             fontSize: 26,
             fontFamily: "'Cormorant Garamond',serif",
+            fontWeight: 800,
             color: T.text,
-            margin: "0 0 3px",
-            fontWeight: 800
+            margin: "0 0 2px"
           }
-        }, "Payments"),
-        h("p", {
+        }, "Pagesat"),
+        h("div", {
           style: {
             color: T.text3,
-            fontSize: 13,
-            margin: 0
+            fontSize: 12
           }
-        }, "Monthly fee tracker")
+        }, "Menaxhimi mujor i pagesave")
       ),
       role === "admin" && h(Btn, {
-        onClick: () => {
-          setForm({
-            student_id: "",
-            student_name: "",
-            month: selMonth,
-            year: selYear,
-            amount: "",
-            method: "cash",
-            notes: ""
-          });
-          setModal("add");
-        },
+        onClick: () => openNewPayment(),
         icon: "plus",
         th: th
-      }, "Record Payment")
+      }, "Regjistro Pagesë")
     ),
 
+    // Month controls
     h(Crd, {
       th: th,
       style: {
-        padding: "15px 18px",
-        marginBottom: 14,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 12
+        padding: 12,
+        marginBottom: 12
       }
     },
-      h("div", null,
-        h("div", {
-          style: {
-            color: T.text3,
-            fontSize: 11,
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-            marginBottom: 3
-          }
-        }, "Total Collected"),
-        h("div", {
-          style: {
-            color: T.text,
-            fontSize: 13
-          }
-        }, `${payments.length} payments`)
-      ),
       h("div", {
         style: {
-          fontSize: 26,
-          fontWeight: 800,
-          color: "#4ade80"
+          display: "flex",
+          gap: 8
         }
-      }, money(totalCollected))
+      },
+        h("select", {
+          value: selMonth,
+          onChange: e => setSelMonth(e.target.value),
+          style: {
+            flex: 1,
+            padding: "10px 12px",
+            borderRadius: 10,
+            border: `1px solid ${T.inputBorder}`,
+            background: T.input,
+            color: T.text,
+            outline: "none",
+            fontSize: 13
+          }
+        }, MONTHS.map(m => h("option", {
+          key: m,
+          value: m,
+          style: { background: T.bg2 }
+        }, m))),
+        h("select", {
+          value: String(selYear),
+          onChange: e => setSelYear(Number(e.target.value)),
+          style: {
+            width: 100,
+            padding: "10px 12px",
+            borderRadius: 10,
+            border: `1px solid ${T.inputBorder}`,
+            background: T.input,
+            color: T.text,
+            outline: "none",
+            fontSize: 13
+          }
+        }, years.map(y => h("option", {
+          key: y,
+          value: y,
+          style: { background: T.bg2 }
+        }, y)))
+      )
     ),
 
-    h("div", {
+    // Compact summary strip
+    h(Crd, {
+      th: th,
       style: {
-        display: "flex",
-        gap: 8,
-        marginBottom: 14
+        padding: 0,
+        marginBottom: 12,
+        overflow: "hidden"
       }
     },
-      h("select", {
-        value: selMonth,
-        onChange: e => setSelMonth(e.target.value),
+      h("div", {
         style: {
-          flex: 1,
-          padding: "10px 12px",
-          background: T.input,
-          border: `1px solid ${T.inputBorder}`,
-          borderRadius: 11,
-          color: T.text,
-          fontSize: 13,
-          outline: "none",
-          WebkitAppearance: "none"
+          display: "grid",
+          gridTemplateColumns: "repeat(4,1fr)"
         }
-      }, MONTHS.map(m => h("option", {
-        key: m,
-        value: m,
-        style: { background: T.bg2 }
-      }, m))),
-      h("select", {
-        value: String(selYear),
-        onChange: e => setSelYear(Number(e.target.value)),
-        style: {
-          width: 100,
-          padding: "10px 12px",
-          background: T.input,
-          border: `1px solid ${T.inputBorder}`,
-          borderRadius: 11,
-          color: T.text,
-          fontSize: 13,
-          outline: "none",
-          WebkitAppearance: "none"
-        }
-      }, years.map(y => h("option", {
-        key: y,
-        value: y,
-        style: { background: T.bg2 }
-      }, y)))
+      },
+        compactStat("Totali", money(totalCollected), T.gold),
+        compactStat("Këtë muaj", money(monthTotal), "#4ade80"),
+        compactStat("Paguar", paidStudents.length, "#4ade80"),
+        h("div", {
+          style: {
+            minWidth: 0,
+            padding: "12px 14px"
+          }
+        },
+          h("div", {
+            style: {
+              fontSize: 10,
+              textTransform: "uppercase",
+              letterSpacing: "0.07em",
+              color: T.text3,
+              marginBottom: 4,
+              fontWeight: 700
+            }
+          }, "Pa paguar"),
+          h("div", {
+            style: {
+              fontSize: 18,
+              fontWeight: 800,
+              color: "#f87171"
+            }
+          }, unpaidStudents.length)
+        )
+      )
     ),
 
-    h("div", {
-      style: {
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr 1fr",
-        gap: 10,
-        marginBottom: 14
-      }
-    },
-      h(Stat, {
-        icon: "credit",
-        label: "This Month",
-        value: money(monthTotal),
-        color: "#4ade80",
-        th: th
-      }),
-      h(Stat, {
-        icon: "check",
-        label: "Paid",
-        value: paidStudents.length,
-        color: "#4ade80",
-        th: th
-      }),
-      h(Stat, {
-        icon: "users",
-        label: "Unpaid",
-        value: unpaidStudents.length,
-        color: "#f87171",
-        th: th
-      })
-    ),
-
+    // Paid / unpaid switch
     h("div", {
       style: {
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: 8,
+        gap: 6,
+        padding: 4,
+        borderRadius: 11,
+        background: T.input,
+        border: `1px solid ${T.border}`,
         marginBottom: 10
       }
     },
       h("button", {
-        onClick: () => setPaymentView("unpaid"),
+        onClick: () => setView("unpaid"),
         style: {
-          padding: "10px 12px",
-          borderRadius: 10,
+          padding: "9px 10px",
+          border: "none",
+          borderRadius: 8,
           cursor: "pointer",
           fontWeight: 700,
-          border: paymentView === "unpaid" ? "1px solid rgba(248,113,113,0.45)" : `1px solid ${T.border}`,
-          background: paymentView === "unpaid" ? "rgba(248,113,113,0.12)" : T.input,
-          color: paymentView === "unpaid" ? "#f87171" : T.text2
+          fontSize: 12,
+          background: view === "unpaid" ? T.card : "transparent",
+          color: view === "unpaid" ? "#f87171" : T.text3,
+          boxShadow: view === "unpaid" ? "0 1px 4px rgba(0,0,0,0.08)" : "none"
         }
-      }, `Unpaid (${unpaidStudents.length})`),
+      }, `Pa paguar (${unpaidStudents.length})`),
       h("button", {
-        onClick: () => setPaymentView("paid"),
+        onClick: () => setView("paid"),
         style: {
-          padding: "10px 12px",
-          borderRadius: 10,
+          padding: "9px 10px",
+          border: "none",
+          borderRadius: 8,
           cursor: "pointer",
           fontWeight: 700,
-          border: paymentView === "paid" ? "1px solid rgba(74,222,128,0.45)" : `1px solid ${T.border}`,
-          background: paymentView === "paid" ? "rgba(74,222,128,0.12)" : T.input,
-          color: paymentView === "paid" ? "#4ade80" : T.text2
+          fontSize: 12,
+          background: view === "paid" ? T.card : "transparent",
+          color: view === "paid" ? "#4ade80" : T.text3,
+          boxShadow: view === "paid" ? "0 1px 4px rgba(0,0,0,0.08)" : "none"
         }
-      }, `Paid (${paidStudents.length})`)
+      }, `Paguar (${paidStudents.length})`)
     ),
 
+    // Main student list
     h(Crd, {
       th: th,
       style: {
-        padding: "14px 16px",
-        marginBottom: 14
-      }
-    },
-      h(SH, {
-        title: `${paymentView === "unpaid" ? "Unpaid" : "Paid"} — ${selMonth} ${selYear}`,
-        color: paymentView === "unpaid" ? "#f87171" : "#4ade80",
-        th: th
-      }),
-      loading ? h(Spinner, { th: th }) :
-      visibleStudents.length === 0 ? h("div", {
-        style: {
-          padding: "14px 0",
-          color: T.text3,
-          fontSize: 13
-        }
-      }, paymentView === "unpaid" ? "Everyone has paid for this month." : "No payments recorded yet for this month.") :
-      visibleStudents.map(s => {
-        const p = paidMap[s.id];
-        return h(Row, {
-          key: s.id,
-          th: th,
-          left: h(Av, {
-            name: s.name,
-            color: paymentView === "unpaid" ? "#f87171" : "#4ade80"
-          }),
-          title: s.name,
-          sub: paymentView === "unpaid"
-            ? (s.instrument || "")
-            : `${money(p.amount)} · ${p.method || "cash"}`,
-          right: paymentView === "unpaid"
-            ? (role === "admin" ? h(Btn, {
-                onClick: () => openMark(s),
-                color: "#4ade80",
-                icon: "check",
-                style: {
-                  padding: "7px 12px",
-                  fontSize: 12
-                },
-                th: th
-              }, "Mark as paid") : h(Bdg, {
-                text: "Unpaid",
-                color: "#f87171"
-              }))
-            : h(Bdg, {
-                text: "Paid",
-                color: "#4ade80"
-              })
-        });
-      })
-    ),
-
-    h("div", {
-      style: {
-        margin: "22px 0 12px",
-        borderTop: `1px solid ${T.border}`,
-        paddingTop: 18
-      }
-    },
-      h("div", {
-        style: {
-          fontSize: 18,
-          fontWeight: 800,
-          color: T.text,
-          fontFamily: "'Cormorant Garamond',serif",
-          marginBottom: 10
-        }
-      }, "Payment History"),
-      h("select", {
-        value: filterStudent,
-        onChange: e => setFilterStudent(e.target.value),
-        style: {
-          width: "100%",
-          padding: "10px 12px",
-          background: T.input,
-          border: `1px solid ${T.inputBorder}`,
-          borderRadius: 11,
-          color: T.text,
-          fontSize: 13,
-          outline: "none",
-          WebkitAppearance: "none",
-          marginBottom: 12
-        }
-      },
-        h("option", {
-          value: "",
-          style: { background: T.bg2 }
-        }, "All Students"),
-        students.map(s => h("option", {
-          key: s.id,
-          value: s.id,
-          style: { background: T.bg2 }
-        }, s.name))
-      )
-    ),
-
-    loading ? h(Spinner, { th: th }) :
-    historySections.length === 0 ? h(Crd, {
-      th: th,
-      style: {
-        padding: 22,
-        textAlign: "center",
-        color: T.text3
-      }
-    }, "No payments recorded yet.") :
-    historySections.map(group => h(Crd, {
-      key: `${group.month}-${group.year}`,
-      th: th,
-      style: {
-        padding: "14px 16px",
-        marginBottom: 10
+        padding: "10px 14px",
+        marginBottom: 18
       }
     },
       h("div", {
@@ -2817,30 +2640,210 @@ const PaymentsPage = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: 10,
-          marginBottom: 6
+          marginBottom: 4
         }
       },
         h("div", {
           style: {
-            fontSize: 15,
+            fontSize: 13,
             fontWeight: 800,
             color: T.text
+          }
+        }, `${selMonth} ${selYear}`),
+        h("div", {
+          style: {
+            fontSize: 11,
+            color: T.text3
+          }
+        }, `${shownStudents.length} studentë`)
+      ),
+
+      loading ? h(Spinner, { th: th }) :
+      shownStudents.length === 0 ? h("div", {
+        style: {
+          padding: "24px 0",
+          textAlign: "center",
+          color: T.text3,
+          fontSize: 13
+        }
+      }, view === "unpaid"
+        ? "Të gjithë studentët kanë paguar për këtë muaj."
+        : "Nuk ka pagesa të regjistruara për këtë muaj."
+      ) :
+      shownStudents.map(student => {
+        const payment = paidMap[student.id];
+
+        return h(Row, {
+          key: student.id,
+          th: th,
+          left: h(Av, {
+            name: student.name,
+            color: view === "unpaid" ? "#f87171" : "#4ade80"
+          }),
+          title: student.name,
+          sub: view === "paid"
+            ? `${money(payment.amount)} · ${payment.method || "cash"}`
+            : (student.instrument || ""),
+          right: view === "unpaid"
+            ? (role === "admin"
+                ? h(Btn, {
+                    onClick: () => openNewPayment(student),
+                    icon: "check",
+                    color: "#4ade80",
+                    style: {
+                      padding: "7px 10px",
+                      fontSize: 11
+                    },
+                    th: th
+                  }, "Shëno Paguar")
+                : h(Bdg, {
+                    text: "Pa paguar",
+                    color: "#f87171"
+                  }))
+            : h(Bdg, {
+                text: "Paguar",
+                color: "#4ade80"
+              })
+        });
+      })
+    ),
+
+    // Simple history divider
+    h("div", {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        margin: "0 0 10px"
+      }
+    },
+      h("div", {
+        style: {
+          fontSize: 16,
+          fontFamily: "'Cormorant Garamond',serif",
+          fontWeight: 800,
+          color: T.text,
+          whiteSpace: "nowrap"
+        }
+      }, "Historia e Pagesave"),
+      h("div", {
+        style: {
+          height: 1,
+          background: T.border,
+          flex: 1
+        }
+      })
+    ),
+
+    loading ? h(Spinner, { th: th }) :
+    historyGroups.length === 0 ? h(Crd, {
+      th: th,
+      style: {
+        padding: 20,
+        textAlign: "center",
+        color: T.text3
+      }
+    }, "Nuk ka pagesa ende.") :
+    historyGroups.map(group => h(Crd, {
+      key: `${group.year}-${group.month}`,
+      th: th,
+      style: {
+        padding: "12px 14px",
+        marginBottom: 8
+      }
+    },
+      h("div", {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 4
+        }
+      },
+        h("div", {
+          style: {
+            color: T.text,
+            fontWeight: 800,
+            fontSize: 13
           }
         }, `${group.month} ${group.year}`),
         h("div", {
           style: {
-            fontSize: 14,
+            color: "#4ade80",
             fontWeight: 800,
-            color: "#4ade80"
+            fontSize: 13
           }
         }, money(group.total))
       ),
-      group.payments.map(renderHistoryRow)
+      group.rows.map(payment => h(Row, {
+        key: payment.id,
+        th: th,
+        left: h("div", {
+          style: {
+            width: 34,
+            height: 34,
+            borderRadius: 9,
+            background: "rgba(74,222,128,0.10)",
+            color: "#4ade80",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0
+          }
+        }, h(Ic, { n: "credit", s: 15 })),
+        title: payment.student_name || "Unknown",
+        sub: payment.method || "cash",
+        right: h("div", {
+          style: {
+            display: "flex",
+            alignItems: "center",
+            gap: 6
+          }
+        },
+          h("span", {
+            style: {
+              fontWeight: 800,
+              fontSize: 13,
+              color: T.text
+            }
+          }, money(payment.amount)),
+          role === "admin" && h("button", {
+            onClick: () => openEditPayment(payment),
+            style: {
+              width: 26,
+              height: 26,
+              borderRadius: 7,
+              border: "none",
+              cursor: "pointer",
+              background: "rgba(96,165,250,0.12)",
+              color: "#60a5fa",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }
+          }, h(Ic, { n: "edit", s: 11 })),
+          role === "admin" && h("button", {
+            onClick: () => del(payment),
+            style: {
+              width: 26,
+              height: 26,
+              borderRadius: 7,
+              border: "none",
+              cursor: "pointer",
+              background: "rgba(248,113,113,0.12)",
+              color: "#f87171",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }
+          }, h(Ic, { n: "trash", s: 11 }))
+        )
+      }))
     )),
 
+    // Payment modal
     modal && h(Modal, {
-      title: modal === "add" ? "Record Payment" : "Edit Payment",
+      title: modal === "add" ? "Regjistro Pagesë" : "Ndrysho Pagesën",
       onClose: () => setModal(null),
       accent: "#4ade80",
       th: th,
@@ -2864,11 +2867,11 @@ const PaymentsPage = ({
         style: {
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gap: "0 12px"
+          gap: "0 10px"
         }
       },
         h(Field, {
-          label: "Month",
+          label: "Muaji",
           value: form.month,
           onChange: v => setForm(f => ({
             ...f,
@@ -2879,7 +2882,7 @@ const PaymentsPage = ({
           th: th
         }),
         h(Field, {
-          label: "Year",
+          label: "Viti",
           value: String(form.year),
           onChange: v => setForm(f => ({
             ...f,
@@ -2893,11 +2896,11 @@ const PaymentsPage = ({
         style: {
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gap: "0 12px"
+          gap: "0 10px"
         }
       },
         h(Field, {
-          label: "Amount (€)",
+          label: "Shuma (€)",
           value: form.amount,
           onChange: v => setForm(f => ({
             ...f,
@@ -2908,7 +2911,7 @@ const PaymentsPage = ({
           th: th
         }),
         h(Field, {
-          label: "Method",
+          label: "Mënyra",
           value: form.method,
           onChange: v => setForm(f => ({
             ...f,
@@ -2919,7 +2922,7 @@ const PaymentsPage = ({
         })
       ),
       h(Field, {
-        label: "Notes",
+        label: "Shënime",
         value: form.notes,
         onChange: v => setForm(f => ({
           ...f,
@@ -2931,7 +2934,7 @@ const PaymentsPage = ({
       h("div", {
         style: {
           display: "flex",
-          gap: 10,
+          gap: 8,
           justifyContent: "flex-end"
         }
       },
@@ -2940,14 +2943,14 @@ const PaymentsPage = ({
           outline: true,
           color: T.text2,
           th: th
-        }, "Cancel"),
+        }, "Anulo"),
         h(Btn, {
           onClick: save,
           disabled: saving,
           icon: "save",
           color: "#4ade80",
           th: th
-        }, saving ? "Saving…" : "Save Payment")
+        }, saving ? "Duke ruajtur…" : "Ruaj Pagesën")
       )
     )
   );
