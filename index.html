@@ -24,7 +24,7 @@
     .main{padding:26px;min-width:0}.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}
     .title h2{font-family:"Playfair Display",serif;font-size:29px;margin:0}.title p{color:var(--muted);font-size:13px;margin:5px 0 0}
     .btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;background:#171717;color:#fff}.btn.gold{background:var(--gold)}.btn.green{background:var(--green)}
-    .btn.light{background:#f0f1f3;color:#303238}.btn.danger{background:#fff0f0;color:var(--red)}.btn.sm{padding:7px 9px;font-size:12px}
+    .btn.light{background:#f0f1f3;color:#303238}.btn.danger{background:#fff0f0;color:var(--red)}.btn.sm{padding:7px 9px;font-size:12px}.btn:disabled{opacity:.65;cursor:not-allowed}
     .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
     .card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.card{padding:17px}
     .kicker{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700}.big{font-size:25px;font-weight:800;margin-top:5px}.sub{font-size:12px;color:var(--muted);margin-top:4px}
@@ -89,7 +89,24 @@ function toast(msg,type="ok"){$("#toastRoot").innerHTML=`<div class="toast ${typ
 const navItems=[["dashboard","Overview"],["students","Students"],["payments","Payments"],["classes","Classes"],["professors","Faculty"],["events","Events"]];
 function navHtml(){return navItems.map(([key,label])=>`<button data-page="${key}" class="${state.page===key?"active":""}">${label}</button>`).join("")}
 function renderNav(){$("#desktopNav").innerHTML=navHtml();$("#mobileNav").innerHTML=navHtml();document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{state.page=b.dataset.page;render()})}
-async function loadAll(){const [students,payments,classes,professors,events]=await Promise.all([db.select("students","?order=name"),db.select("payments","?order=year.desc,month"),db.select("classes","?order=name"),db.select("professors","?order=name"),db.select("events","?order=date")]);state.students=students;state.payments=payments;state.classes=classes;state.professors=professors;state.events=events}
+async function loadAll(){
+  const jobs=[
+    ["students",db.select("students","?order=name")],
+    ["payments",db.select("payments","?order=year.desc,month")],
+    ["classes",db.select("classes","?order=name")],
+    ["professors",db.select("professors","?order=name")],
+    ["events",db.select("events","?order=date")]
+  ];
+  const results=await Promise.allSettled(jobs.map(x=>x[1]));
+  results.forEach((r,i)=>{
+    const key=jobs[i][0];
+    if(r.status==="fulfilled") state[key]=r.value||[];
+    else {
+      state[key]=[];
+      console.warn("Could not load "+key,r.reason);
+    }
+  });
+}
 function top(title,sub,button=""){return`<div class="topbar"><div class="title"><h2>${title}</h2><p>${sub}</p></div>${button}</div>`}
 function card(label,value,sub=""){return`<div class="card"><div class="kicker">${label}</div><div class="big">${value}</div>${sub?`<div class="sub">${sub}</div>`:""}</div>`}
 function empty(msg){return`<div class="empty">${msg}</div>`}
@@ -193,15 +210,67 @@ function eventModal(id=null){
 async function deleteRow(table,id,label){if(!confirm(`Delete ${label}?`))return;try{await db.remove(table,id);toast("Deleted");await loadAll();render()}catch(e){toast(e.message,"error")}}
 
 async function startApp(user,profile){
-  state.user=user;state.profile=profile;$("#userMini").innerHTML=`<b>${esc(profile.full_name||user.email||"Admin")}</b><br>${esc(user.email||"")}`;$("#login").classList.add("hidden");$("#app").classList.remove("hidden");
-  try{await loadAll();render()}catch(e){toast(e.message,"error")}
+  state.user=user;
+  state.profile=profile||{full_name:user?.email||"Admin",role:"admin",email:user?.email||""};
+  $("#userMini").innerHTML=`<b>${esc(state.profile.full_name||user.email||"Admin")}</b><br>${esc(user.email||"")}`;
+  $("#login").classList.add("hidden");
+  $("#app").classList.remove("hidden");
+  render();
+  await loadAll();
+  render();
 }
 async function restoreSession(){
   if(!state.token)return;
-  try{const user=await getUser(state.token);const profiles=await db.select("profiles",`?user_id=eq.${user.id}`);if(!profiles.length)throw new Error("No profile");if(profiles[0].role&&profiles[0].role!=="admin")throw new Error("Admin access required");await startApp(user,profiles[0])}
-  catch(e){localStorage.removeItem("misbah_admin_token");state.token=""}
+  try{
+    const user=await getUser(state.token);
+    let profile=null;
+    try{
+      const profiles=await db.select("profiles",`?user_id=eq.${user.id}`);
+      profile=profiles?.[0]||null;
+    }catch(e){
+      console.warn("Profile lookup failed",e);
+    }
+    await startApp(user,profile);
+  }catch(e){
+    localStorage.removeItem("misbah_admin_token");
+    state.token="";
+  }
 }
-$("#loginBtn").onclick=async()=>{const email=$("#loginEmail").value.trim(),password=$("#loginPassword").value;$("#loginError").textContent="";try{const d=await signIn(email,password);state.token=d.access_token;localStorage.setItem("misbah_admin_token",state.token);const profiles=await db.select("profiles",`?user_id=eq.${d.user.id}`);if(!profiles.length)throw new Error("No profile found.");if(profiles[0].role&&profiles[0].role!=="admin")throw new Error("Admin access required.");await startApp(d.user,profiles[0])}catch(e){$("#loginError").textContent=e.message;localStorage.removeItem("misbah_admin_token");state.token=""}};
+$("#loginBtn").onclick=async()=>{
+  const btn=$("#loginBtn");
+  const email=$("#loginEmail").value.trim();
+  const password=$("#loginPassword").value;
+  $("#loginError").textContent="";
+  if(!email||!password){
+    $("#loginError").textContent="Please enter email and password.";
+    return;
+  }
+  btn.disabled=true;
+  btn.textContent="Signing in...";
+  try{
+    const d=await signIn(email,password);
+    state.token=d.access_token;
+    localStorage.setItem("misbah_admin_token",state.token);
+
+    let profile=null;
+    try{
+      const profiles=await db.select("profiles",`?user_id=eq.${d.user.id}`);
+      profile=profiles?.[0]||null;
+    }catch(e){
+      console.warn("Profile lookup failed",e);
+    }
+
+    await startApp(d.user,profile);
+  }catch(e){
+    console.error(e);
+    $("#loginError").textContent=e.message||"Login failed";
+    localStorage.removeItem("misbah_admin_token");
+    state.token="";
+  }finally{
+    btn.disabled=false;
+    btn.textContent="Sign in";
+  }
+};
 $("#loginPassword").addEventListener("keydown",e=>{if(e.key==="Enter")$("#loginBtn").click()});
 $("#logoutBtn").onclick=()=>{localStorage.removeItem("misbah_admin_token");location.reload()};
 restoreSession();
